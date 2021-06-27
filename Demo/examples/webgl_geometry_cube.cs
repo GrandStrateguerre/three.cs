@@ -1,11 +1,9 @@
 ﻿namespace Demo
 {
+    using Examples;
     using System.Diagnostics;
     using System.Drawing;
     using System.Windows.Forms;
-
-    using Examples;
-
     using ThreeCs.Cameras;
     using ThreeCs.Core;
     using ThreeCs.Extras;
@@ -38,7 +36,7 @@
 
             var geometry = new BoxGeometry(200, 200, 200);
 
-            var texture = ImageUtils.LoadTexture(@"examples/textures/crate.gif");
+            var texture = ImageUtils.LoadTexture(@"examples\textures/crate.jpg");
             texture.Anisotropy = this.renderer.MaxAnisotropy;
 
             var material = new MeshBasicMaterial { Map = texture };
