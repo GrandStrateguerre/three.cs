@@ -23,6 +23,7 @@
         private Object3D mesh;
 
         private const string FragmentShader = @"
+            #version 330      
             precision mediump float;
             precision mediump int;
 
@@ -41,6 +42,7 @@
             }";
 
         private const string VertexShader = @"
+            #version 330  
             precision mediump float;
             precision mediump int;
 
