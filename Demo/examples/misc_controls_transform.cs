@@ -1,22 +1,19 @@
 ﻿namespace Demo
 {
+    using Demo.examples.cs.controls;
+    using Examples;
     using System;
     using System.Diagnostics;
     using System.Drawing;
     using System.Windows.Forms;
-
-    using Demo.examples.cs.controls;
-
-    using Examples;
-
-    using ThreeCs.Extras.Helpers;
-    using ThreeCs.Math;
     using ThreeCs.Cameras;
     using ThreeCs.Core;
     using ThreeCs.Extras;
     using ThreeCs.Extras.Geometries;
+    using ThreeCs.Extras.Helpers;
     using ThreeCs.Lights;
     using ThreeCs.Materials;
+    using ThreeCs.Math;
     using ThreeCs.Objects;
     using ThreeCs.Scenes;
 
@@ -52,25 +49,25 @@
             light.Position = new Vector3(1, 1, 1);
             scene.Add(light);
 
-            var texture = ImageUtils.LoadTexture(@"examples/textures/crate.gif");
+            var texture = ImageUtils.LoadTexture(@"examples\textures/crate.jpg");
             texture.Anisotropy = this.renderer.MaxAnisotropy;
 
             var geometry = new BoxGeometry(200, 200, 200);
             var material = new MeshLambertMaterial(null) { Map = texture };
 
 
-//var arrowGeometry = new Geometry();
-            
-//var cm = new Mesh(new CylinderGeometry(0, 200, 1000, 12, 1, false));
-//cm.Position.Y = 100;
-//cm.UpdateMatrix();
+            //var arrowGeometry = new Geometry();
 
-//arrowGeometry.Merge((Geometry)cm.Geometry, cm.Matrix);
+            //var cm = new Mesh(new CylinderGeometry(0, 200, 1000, 12, 1, false));
+            //cm.Position.Y = 100;
+            //cm.UpdateMatrix();
 
-//var ww = new Mesh(arrowGeometry);
+            //arrowGeometry.Merge((Geometry)cm.Geometry, cm.Matrix);
+
+            //var ww = new Mesh(arrowGeometry);
 
 
-//scene.Add(ww);
+            //scene.Add(ww);
 
 
 

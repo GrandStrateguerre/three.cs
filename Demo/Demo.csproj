@@ -153,11 +153,6 @@
     <Folder Include="examples\sounds\" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="examples\textures\crate.gif">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
     <None Include="examples\textures\Sprites\spark1.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -232,6 +227,9 @@
     <Content Include="examples\objs\male02\orig_02_-_Defaul1noCulling.dds" />
     <Content Include="examples\objs\male02\orig_02_-_Defaul1noCulling.JPG" />
     <Content Include="examples\objs\male02\readme.txt" />
+    <None Include="examples\textures\crate.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
