@@ -1,13 +1,10 @@
 ﻿namespace Demo.examples
 {
+    using Demo.examples.cs.loaders;
+    using Examples;
     using System.Diagnostics;
     using System.Drawing;
     using System.Windows.Forms;
-
-    using Demo.examples.cs.loaders;
-
-    using Examples;
-
     using ThreeCs.Cameras;
     using ThreeCs.Lights;
     using ThreeCs.Loaders;
@@ -45,10 +42,10 @@
 
             // light
 
-            var ambient = new AmbientLight((Color)colorConvertor.ConvertFromString("#101030") );
+            var ambient = new AmbientLight((Color)colorConvertor.ConvertFromString("#101030"));
             scene.Add(ambient);
 
-            var directionalLight = new DirectionalLight((Color)colorConvertor.ConvertFromString("#ffeedd") );
+            var directionalLight = new DirectionalLight((Color)colorConvertor.ConvertFromString("#ffeedd"));
             directionalLight.Position = new Vector3(0, 0, 1);
             scene.Add(directionalLight);
 
@@ -59,7 +56,8 @@
             var texture = new Texture();
 
             var loader = new ImageLoader(manager);
-            loader.Load( @"examples/textures/UV_Grid_Sm.jpg", image => {
+            loader.Load(@"examples/textures/UV_Grid_Sm.jpg", image =>
+            {
                 texture.Image = image;
                 texture.Format = ImageLoader.PixelFormatToThree(image.PixelFormat);
                 texture.NeedsUpdate = true;
@@ -68,9 +66,12 @@
             // model
 
             var modelLoader = new OBJLoader(manager);
-            modelLoader.Load(@"examples/objs/male02/male02.obj", object3D => {
-                object3D.Traverse( child => {
-                    if (child is Mesh) {
+            modelLoader.Load(@"examples\objs\male02\male02.obj", object3D =>
+            {
+                object3D.Traverse(child =>
+                {
+                    if (child is Mesh)
+                    {
                         ((IMap)child.Material).Map = texture;
                     }
                 });

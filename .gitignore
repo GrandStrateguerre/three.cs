@@ -42,3 +42,4 @@ Binaries/
 # ReSharper is a .NET coding add-in
 _ReSharper*
 
+/.vs

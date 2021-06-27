@@ -124,7 +124,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="examples\objs\male02\male02.mtl" />
-    <None Include="examples\objs\male02\male02.obj" />
+    <None Include="examples\objs\male02\male02.obj">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="examples\objs\male02\Male02_bin.bin" />
     <None Include="examples\objs\male02\male02_dds.mtl" />
     <None Include="Properties\Settings.settings">
