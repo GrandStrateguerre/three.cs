@@ -1,14 +1,11 @@
 ﻿namespace Demo.examples
 {
+    using Demo.examples.loaders;
+    using Examples;
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.Drawing;
     using System.Windows.Forms;
-
-    using Demo.examples.loaders;
-
-    using Examples;
-
     using ThreeCs;
     using ThreeCs.Cameras;
     using ThreeCs.Extras;
@@ -67,43 +64,46 @@
             map2.Anisotropy = 4;
 
             var map3 = loader.Load("examples/textures/compressed/hepatica_dxt3_mip.dds");
-			map3.Anisotropy = 4;
+            map3.Anisotropy = 4;
 
             var map4 = loader.Load("examples/textures/compressed/explosion_dxt5_mip.dds");
-			map4.Anisotropy = 4;
+            map4.Anisotropy = 4;
 
             var map5 = loader.Load("examples/textures/compressed/disturb_argb_nomip.dds");
-			map5.MinFilter = map5.MagFilter = Three.LinearFilter;
-			map5.Anisotropy = 4;
+            map5.MinFilter = map5.MagFilter = Three.LinearFilter;
+            map5.Anisotropy = 4;
 
             var map6 = loader.Load("examples/textures/compressed/disturb_argb_mip.dds");
-			map6.Anisotropy = 4;
+            map6.Anisotropy = 4;
 
-            var cubemap1 = loader.Load("examples/textures/compressed/Mountains.dds", texture => { 
+            var cubemap1 = loader.Load("examples/textures/compressed/Mountains.dds", texture =>
+            {
                 texture.MagFilter = Three.LinearFilter;
                 texture.MinFilter = Three.LinearFilter;
                 texture.Mapping = new Three.CubeReflectionMapping();
-            //    material1.needsUpdate = true;
+                //    material1.needsUpdate = true;
             });
 
-            var cubemap2 = loader.Load("examples/textures/compressed/Mountains_argb_mip.dds", texture => { 
+            var cubemap2 = loader.Load("examples/textures/compressed/Mountains_argb_mip.dds", texture =>
+            {
                 texture.MagFilter = Three.LinearFilter;
                 texture.MinFilter = Three.LinearFilter;
                 texture.Mapping = new Three.CubeReflectionMapping();
-            //    material5.needsUpdate = true;
+                //    material5.needsUpdate = true;
             });
 
-            var cubemap3 = loader.Load("examples/textures/compressed/Mountains_argb_nomip.dds", texture => { 
+            var cubemap3 = loader.Load("examples/textures/compressed/Mountains_argb_nomip.dds", texture =>
+            {
                 texture.MagFilter = Three.LinearFilter;
                 texture.MinFilter = Three.LinearFilter;
                 texture.Mapping = new Three.CubeReflectionMapping();
-            //    material6.needsUpdate = true;
+                //    material6.needsUpdate = true;
             });
 
             var material1 = new MeshBasicMaterial() { Map = map1, EnvMap = cubemap1 };
             var material2 = new MeshBasicMaterial() { Map = map2 };
             var material3 = new MeshBasicMaterial() { Map = map3, AlphaTest = 0.5f, Side = Three.DoubleSide };
-			var material4 = new MeshBasicMaterial() { Map = map4, Side = Three.DoubleSide, Blending = Three.AdditiveBlending, DepthTest = false, Transparent = true } ;
+            var material4 = new MeshBasicMaterial() { Map = map4, Side = Three.DoubleSide, Blending = Three.AdditiveBlending, DepthTest = false, Transparent = true };
             var material5 = new MeshBasicMaterial() { EnvMap = cubemap2 };
             var material6 = new MeshBasicMaterial() { EnvMap = cubemap3 };
             var material7 = new MeshBasicMaterial() { Map = map5 };
@@ -120,7 +120,7 @@
 
             // Testing purposes
 
-            var texture1 = ImageUtils.LoadTexture(@"examples/textures/crate.gif");
+            var texture1 = ImageUtils.LoadTexture(@"examples/textures/crate.jpg");
             texture1.Anisotropy = this.renderer.MaxAnisotropy;
 
             var material = new MeshBasicMaterial { Map = texture1 };
@@ -133,8 +133,8 @@
             // X . . .
 
             var mesh = new Mesh(new TorusGeometry(100, 50, 32, 16), material1); // material1
-			mesh.Position.X = -600;
-			mesh.Position.Y = -200;
+            mesh.Position.X = -600;
+            mesh.Position.Y = -200;
             this.scene.Add(mesh);
             this.meshes.Add(mesh);
 
@@ -142,8 +142,8 @@
             // . X . .
 
             mesh = new Mesh(this.geometry, material2); // material2
-			mesh.Position.X = -200;
-			mesh.Position.Y = -200;
+            mesh.Position.X = -200;
+            mesh.Position.Y = -200;
             this.scene.Add(mesh);
             this.meshes.Add(mesh);
 
@@ -151,8 +151,8 @@
             // . . . .
 
             mesh = new Mesh(this.geometry, material3); // material3
-			mesh.Position.X = -200;
-			mesh.Position.Y = 200;
+            mesh.Position.X = -200;
+            mesh.Position.Y = 200;
             this.scene.Add(mesh);
             this.meshes.Add(mesh);
 
@@ -160,8 +160,8 @@
             // . . . .
 
             mesh = new Mesh(this.geometry, material4); // material4
-			mesh.Position.X = -600;
-			mesh.Position.Y = 200;
+            mesh.Position.X = -600;
+            mesh.Position.Y = 200;
             this.scene.Add(mesh);
             this.meshes.Add(mesh);
 
@@ -169,8 +169,8 @@
             // . . . .
 
             mesh = new Mesh(new BoxGeometry(200, 200, 200), material5); // material5
-			mesh.Position.X = 200;
-			mesh.Position.Y = 200;
+            mesh.Position.X = 200;
+            mesh.Position.Y = 200;
             this.scene.Add(mesh);
             this.meshes.Add(mesh);
 
@@ -178,8 +178,8 @@
             // . . X .
 
             mesh = new Mesh(new BoxGeometry(200, 200, 200), material6); // material6
-			mesh.Position.X = 200;
-			mesh.Position.Y = -200;
+            mesh.Position.X = 200;
+            mesh.Position.Y = -200;
             this.scene.Add(mesh);
             this.meshes.Add(mesh);
 
@@ -196,8 +196,8 @@
             // . . . .
 
             mesh = new Mesh(this.geometry, material8); // material8
-			mesh.Position.X = 600;
-			mesh.Position.Y = 200;
+            mesh.Position.X = 600;
+            mesh.Position.Y = 200;
             this.scene.Add(mesh);
             this.meshes.Add(mesh);
         }
