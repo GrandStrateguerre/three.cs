@@ -1,17 +1,15 @@
 ﻿namespace Demo.examples
 {
+    using Examples;
     using System.Drawing;
     using System.Windows.Forms;
-
-    using Examples;
-
     using ThreeCs.Cameras;
     using ThreeCs.Extras;
     using ThreeCs.Extras.Geometries;
     using ThreeCs.Materials;
     using ThreeCs.Math;
-    using ThreeCs.Scenes;
     using ThreeCs.Objects;
+    using ThreeCs.Scenes;
 
     [Example("webgl_test_memory", ExampleCategory.OpenTK, "test")]
     class webgl_test_memory : Example
@@ -46,7 +44,7 @@
 
             var geometry = new SphereGeometry(50, widthSegments, heightSegments);
 
-            var texture = ImageUtils.LoadTexture(@"examples/textures/crate.gif");
+            var texture = ImageUtils.LoadTexture(@"examples/textures/crate.jpg");
             texture.NeedsUpdate = true;
 
             var material = new MeshBasicMaterial() { Map = texture, Wireframe = true };
@@ -59,11 +57,11 @@
 
             scene.Remove(mesh);
 
-			// clean up
+            // clean up
 
-			geometry.Dispose();
-			material.Dispose();
-			texture.Dispose();
+            geometry.Dispose();
+            material.Dispose();
+            texture.Dispose();
         }
 
         /// <summary>
@@ -73,9 +71,9 @@
         {
             this.scene.Dispose();
             this.camera.Dispose();
-            
+
             base.Unload();
         }
-    
+
     }
 }
