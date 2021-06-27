@@ -1,5 +1,6 @@
 ﻿namespace ThreeCs.Renderers
 {
+    using OpenTK.Graphics.OpenGL;
     using System;
     using System.Collections;
     using System.Collections.Generic;
@@ -7,22 +8,19 @@
     using System.Drawing;
     using System.Drawing.Imaging;
     using System.Windows.Forms;
-
-    using OpenTK.Graphics.OpenGL;
-
     using ThreeCs.Cameras;
     using ThreeCs.Core;
     using ThreeCs.Extras.Helpers;
     using ThreeCs.Extras.Objects;
     using ThreeCs.Lights;
     using ThreeCs.Materials;
+    using ThreeCs.Math;
     using ThreeCs.Objects;
     using ThreeCs.Renderers.Shaders;
     using ThreeCs.Renderers.WebGL;
     using ThreeCs.Renderers.WebGL.PlugIns;
     using ThreeCs.Scenes;
     using ThreeCs.Textures;
-    using ThreeCs.Math;
 
     // Based on version 68, 69
 
@@ -82,8 +80,8 @@
             {
                 this._size = value;
 
-          //      _canvas.width = size.Width;
-          //      _canvas.height = size.Height;
+                //      _canvas.width = size.Width;
+                //      _canvas.height = size.Height;
 
                 //if ( updateStyle !== false ) {
 
@@ -171,7 +169,7 @@
         private float _oldLineWidth = -1;
 
         private bool? _oldDepthTest = null;
-        
+
         private bool? _oldDepthWrite = null;
 
         private int _oldBlendDst = -1;
@@ -291,7 +289,7 @@
         /// </summary>
         public WebGLRenderer(Control control)
         {
-            //	        Trace.TraceInformation( "Three.WebGLRenderer {0}", Three.Version );
+            //          Trace.TraceInformation( "Three.WebGLRenderer {0}", Three.Version );
 
             this.shaderLib = new ShaderLib();
 
@@ -386,13 +384,13 @@
         /// <summary>
         /// 
         /// </summary>
-	    public void SetClearColor (Color color, int alpha = 255)
+        public void SetClearColor(Color color, int alpha = 255)
         {
             this.ClearColor = color;
-		    this.ClearAlpha = alpha;
+            this.ClearAlpha = alpha;
 
             GL.ClearColor(Color.FromArgb(this.ClearAlpha, this.ClearColor));
-	    }
+        }
 
         /// <summary>
         /// 
@@ -415,7 +413,7 @@
         /// <param name="y"></param>
         /// <param name="width"></param>
         /// <param name="height"></param>
-        public void SetScissor ( int x, int y, int width, int height )
+        public void SetScissor(int x, int y, int width, int height)
         {
             GL.Scissor(
                 x * this.devicePixelRatio,
@@ -429,13 +427,13 @@
         /// 
         /// </summary>
         /// <param name="enable"></param>
-	    public void EnableScissorTest  ( bool enable )
-	    {
-	        if (enable)
-	            GL.Enable(EnableCap.ScissorTest);
-	        else 
+        public void EnableScissorTest(bool enable)
+        {
+            if (enable)
+                GL.Enable(EnableCap.ScissorTest);
+            else
                 GL.Disable(EnableCap.ScissorTest);
-	    }
+        }
 
         /// <summary>
         /// </summary>
@@ -458,9 +456,9 @@
         /// <param name="textureTarget"></param>
         private void SetupFrameBuffer(int framebuffer, WebGLRenderTarget renderTarget, TextureTarget textureTarget)
         {
-		    GL.BindFramebuffer( FramebufferTarget.Framebuffer, framebuffer );
+            GL.BindFramebuffer(FramebufferTarget.Framebuffer, framebuffer);
             GL.FramebufferTexture2D(FramebufferTarget.Framebuffer, FramebufferAttachment.ColorAttachment0, textureTarget, renderTarget.__webglTexture, 0);
-	    }
+        }
 
         /// <summary>
         /// 
@@ -471,24 +469,29 @@
         {
             GL.BindRenderbuffer(RenderbufferTarget.Renderbuffer, renderbuffer);
 
-		    if ( renderTarget.DepthBuffer.Value && ! renderTarget.StencilBuffer.Value ) {
+            if (renderTarget.DepthBuffer.Value && !renderTarget.StencilBuffer.Value)
+            {
 
-			    GL.RenderbufferStorage(RenderbufferTarget.Renderbuffer, RenderbufferStorage.DepthComponent16, renderTarget.Width, renderTarget.Height );
+                GL.RenderbufferStorage(RenderbufferTarget.Renderbuffer, RenderbufferStorage.DepthComponent16, renderTarget.Width, renderTarget.Height);
                 GL.FramebufferRenderbuffer(FramebufferTarget.Framebuffer, FramebufferAttachment.DepthAttachment, RenderbufferTarget.Renderbuffer, renderbuffer);
 
-		    /* For some reason this is not working. Defaulting to RGBA4.
-		    } else if ( ! renderTarget.depthBuffer && renderTarget.stencilBuffer ) {
+                /* For some reason this is not working. Defaulting to RGBA4.
+                } else if ( ! renderTarget.depthBuffer && renderTarget.stencilBuffer ) {
 
-			    GL.renderbufferStorage( GL.RENDERBUFFER, GL.STENCIL_INDEX8, renderTarget.width, renderTarget.height );
-			    GL.framebufferRenderbuffer( GL.FRAMEBUFFER, GL.STENCIL_ATTACHMENT, GL.RENDERBUFFER, renderbuffer );
-		    */
-		    } else if ( renderTarget.DepthBuffer.Value && renderTarget.StencilBuffer.Value ) {
+                    GL.renderbufferStorage( GL.RENDERBUFFER, GL.STENCIL_INDEX8, renderTarget.width, renderTarget.height );
+                    GL.framebufferRenderbuffer( GL.FRAMEBUFFER, GL.STENCIL_ATTACHMENT, GL.RENDERBUFFER, renderbuffer );
+                */
+            }
+            else if (renderTarget.DepthBuffer.Value && renderTarget.StencilBuffer.Value)
+            {
                 GL.RenderbufferStorage(RenderbufferTarget.Renderbuffer, RenderbufferStorage.DepthStencil, renderTarget.Width, renderTarget.Height);
                 GL.FramebufferRenderbuffer(FramebufferTarget.Framebuffer, FramebufferAttachment.DepthStencilAttachment, RenderbufferTarget.Renderbuffer, renderbuffer);
-		    } else {
+            }
+            else
+            {
                 GL.RenderbufferStorage(RenderbufferTarget.Renderbuffer, RenderbufferStorage.Rgba4, renderTarget.Width, renderTarget.Height);
-		    }
-	    }
+            }
+        }
 
         /// <summary>
         /// 
@@ -500,57 +503,59 @@
 
             if ((null != renderTarget) && (renderTarget.__webglFramebuffer <= 0))
             {
-       			if ( renderTarget.DepthBuffer == null ) renderTarget.DepthBuffer = true;
-			    if ( renderTarget.StencilBuffer == null ) renderTarget.StencilBuffer = true;
+                if (renderTarget.DepthBuffer == null) renderTarget.DepthBuffer = true;
+                if (renderTarget.StencilBuffer == null) renderTarget.StencilBuffer = true;
 
                 renderTarget.Disposed += onRenderTargetDispose;
 
                 renderTarget.__webglTexture = GL.GenTexture();
 
-			    this.Info.memory.Textures ++;
+                this.Info.memory.Textures++;
 
-			    // Setup texture, create render and frame buffers
+                // Setup texture, create render and frame buffers
 
                 var isTargetPowerOfTwo = IsPowerOfTwo(renderTarget.Width) && IsPowerOfTwo(renderTarget.Height);
                 var glInternalFormat = (PixelInternalFormat)paramThreeToGL(renderTarget.Format);
                 var glFormat = OpenTK.Graphics.OpenGL.PixelFormat.Bgra;
                 var glType = (PixelType)paramThreeToGL(renderTarget.Type);
 
-			    if (isCube)
+                if (isCube)
                 {
                     throw new NotImplementedException();
-/*
-				    renderTarget.__webglFramebuffer = [];
-				    renderTarget.__webglRenderbuffer = [];
+                    /*
+                                        renderTarget.__webglFramebuffer = [];
+                                        renderTarget.__webglRenderbuffer = [];
 
-				    GL.BindTexture(TextureTarget.TextureCubeMap, renderTarget.__webglTexture );
-				    setTextureParameters( GL.TEXTURE_CUBE_MAP, renderTarget, isTargetPowerOfTwo );
+                                        GL.BindTexture(TextureTarget.TextureCubeMap, renderTarget.__webglTexture );
+                                        setTextureParameters( GL.TEXTURE_CUBE_MAP, renderTarget, isTargetPowerOfTwo );
 
-				    for ( var i = 0; i < 6; i ++ ) {
+                                        for ( var i = 0; i < 6; i ++ ) {
 
-					    renderTarget.__webglFramebuffer[ i ] = GL.CreateFramebuffer();
-					    renderTarget.__webglRenderbuffer[ i ] = GL.CreateRenderbuffer();
+                                            renderTarget.__webglFramebuffer[ i ] = GL.CreateFramebuffer();
+                                            renderTarget.__webglRenderbuffer[ i ] = GL.CreateRenderbuffer();
 
-					    GL.TexImage2D( GL.TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, glFormat, renderTarget.width, renderTarget.height, 0, glFormat, glType, null );
+                                            GL.TexImage2D( GL.TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, glFormat, renderTarget.width, renderTarget.height, 0, glFormat, glType, null );
 
-					    setupFrameBuffer( renderTarget.__webglFramebuffer[ i ], renderTarget, GL.TEXTURE_CUBE_MAP_POSITIVE_X + i );
-					    setupRenderBuffer( renderTarget.__webglRenderbuffer[ i ], renderTarget );
-				    }
-*/
-                    if (isTargetPowerOfTwo) 
+                                            setupFrameBuffer( renderTarget.__webglFramebuffer[ i ], renderTarget, GL.TEXTURE_CUBE_MAP_POSITIVE_X + i );
+                                            setupRenderBuffer( renderTarget.__webglRenderbuffer[ i ], renderTarget );
+                                        }
+                    */
+                    if (isTargetPowerOfTwo)
                         GL.GenerateMipmap(GenerateMipmapTarget.TextureCubeMap);
 
-                } else
-			    {
-			        renderTarget.__webglFramebuffer = GL.GenFramebuffer();
+                }
+                else
+                {
+                    renderTarget.__webglFramebuffer = GL.GenFramebuffer();
 
-				    if (null != renderTarget.ShareDepthFrom ) 
+                    if (null != renderTarget.ShareDepthFrom)
                     {
-					    renderTarget.__webglRenderbuffer = renderTarget.ShareDepthFrom.__webglRenderbuffer;
-				    } else
-				    {
-				        renderTarget.__webglRenderbuffer = GL.GenRenderbuffer();
-				    }
+                        renderTarget.__webglRenderbuffer = renderTarget.ShareDepthFrom.__webglRenderbuffer;
+                    }
+                    else
+                    {
+                        renderTarget.__webglRenderbuffer = GL.GenRenderbuffer();
+                    }
 
                     GL.BindTexture(TextureTarget.Texture2D, renderTarget.__webglTexture);
                     SetTextureParameters(TextureTarget.Texture2D, renderTarget, isTargetPowerOfTwo);
@@ -559,25 +564,31 @@
 
                     this.SetupFrameBuffer(renderTarget.__webglFramebuffer, renderTarget, TextureTarget.Texture2D);
 
-				    if (null != renderTarget.ShareDepthFrom ) {
+                    if (null != renderTarget.ShareDepthFrom)
+                    {
 
-					    if ( renderTarget.DepthBuffer.Value && ! renderTarget.StencilBuffer.Value ) {
+                        if (renderTarget.DepthBuffer.Value && !renderTarget.StencilBuffer.Value)
+                        {
 
                             GL.FramebufferRenderbuffer(FramebufferTarget.Framebuffer, FramebufferAttachment.DepthAttachment, RenderbufferTarget.Renderbuffer, renderTarget.__webglRenderbuffer);
 
-					    } else if ( renderTarget.DepthBuffer.Value && renderTarget.StencilBuffer.Value ) {
+                        }
+                        else if (renderTarget.DepthBuffer.Value && renderTarget.StencilBuffer.Value)
+                        {
 
                             GL.FramebufferRenderbuffer(FramebufferTarget.Framebuffer, FramebufferAttachment.DepthStencilAttachment, RenderbufferTarget.Renderbuffer, renderTarget.__webglRenderbuffer);
 
-					    }
+                        }
 
-				    } else {
-					    this.SetupRenderBuffer( renderTarget.__webglRenderbuffer, renderTarget );
-				    }
+                    }
+                    else
+                    {
+                        this.SetupRenderBuffer(renderTarget.__webglRenderbuffer, renderTarget);
+                    }
 
                     if (isTargetPowerOfTwo) GL.GenerateMipmap(GenerateMipmapTarget.Texture2D);
                 }
-     
+
                 // Release everything
 
                 if (isCube)
@@ -596,25 +607,27 @@
             var framebuffer = -1;
             int width;
             int height;
-            int vx; 
+            int vx;
             int vy;
 
             if (null != renderTarget)
             {
-      			if (isCube)
-      			{
+                if (isCube)
+                {
                     var renderTargetCube = renderTarget as WebGLRenderTargetCube;
                     //framebuffer = renderTarget.__webglFramebuffer[ renderTargetCube.activeCubeFace ];
-      			} else {
-				    framebuffer = renderTarget.__webglFramebuffer;
-			    }
+                }
+                else
+                {
+                    framebuffer = renderTarget.__webglFramebuffer;
+                }
 
-			    width = renderTarget.Width;
-			    height = renderTarget.Height;
+                width = renderTarget.Width;
+                height = renderTarget.Height;
 
-			    vx = 0;
-			    vy = 0;
-            } 
+                vx = 0;
+                vy = 0;
+            }
             else
             {
                 framebuffer = -1;
@@ -626,16 +639,17 @@
                 vy = this._viewportY;
             }
 
-            if ( framebuffer != this._currentFramebuffer ) {
+            if (framebuffer != this._currentFramebuffer)
+            {
 
-			    GL.BindFramebuffer(FramebufferTarget.Framebuffer, framebuffer );
-			    GL.Viewport( vx, vy, width, height );
+                GL.BindFramebuffer(FramebufferTarget.Framebuffer, framebuffer);
+                GL.Viewport(vx, vy, width, height);
 
-			    this._currentFramebuffer = framebuffer;
-		    }
+                this._currentFramebuffer = framebuffer;
+            }
 
-		    this._currentWidth = width;
-		    this._currentHeight = height;
+            this._currentWidth = width;
+            this._currentHeight = height;
         }
 
         void onRenderTargetDispose(object sender, EventArgs e)
@@ -643,18 +657,21 @@
             throw new NotImplementedException();
         }
 
-        private void UpdateRenderTargetMipmap (WebGLRenderTarget renderTarget )
+        private void UpdateRenderTargetMipmap(WebGLRenderTarget renderTarget)
         {
-		    if ( renderTarget is WebGLRenderTargetCube ) {
-			    GL.BindTexture(TextureTarget.TextureCubeMap, renderTarget.__webglTexture );
-			    GL.GenerateMipmap(GenerateMipmapTarget.TextureCubeMap);
-			    GL.BindTexture(TextureTarget.TextureCubeMap, 0 );
-		    } else {
-			    GL.BindTexture(TextureTarget.Texture2D, renderTarget.__webglTexture );
-			    GL.GenerateMipmap(GenerateMipmapTarget.Texture2D);
-			    GL.BindTexture(TextureTarget.Texture2D, 0 );
-		    }
-	    }
+            if (renderTarget is WebGLRenderTargetCube)
+            {
+                GL.BindTexture(TextureTarget.TextureCubeMap, renderTarget.__webglTexture);
+                GL.GenerateMipmap(GenerateMipmapTarget.TextureCubeMap);
+                GL.BindTexture(TextureTarget.TextureCubeMap, 0);
+            }
+            else
+            {
+                GL.BindTexture(TextureTarget.Texture2D, renderTarget.__webglTexture);
+                GL.GenerateMipmap(GenerateMipmapTarget.Texture2D);
+                GL.BindTexture(TextureTarget.Texture2D, 0);
+            }
+        }
 
         /// <summary>
         /// </summary>
@@ -663,7 +680,7 @@
         /// <param name="renderTarget"></param>
         /// <param name="forceClear"></param>
         public void Render(Scene scene, Camera camera, WebGLRenderTarget renderTarget = null, bool forceClear = false)
-        {            
+        {
             Debug.Assert(null != scene, "OpenTKRenderer.Render: scene can not be null");
             Debug.Assert(null != camera, "OpenTKRenderer.Render: camera can not be null");
 
@@ -687,16 +704,18 @@
             // update Skeleton objects
 
             scene.Traverse(
-                object3D => {
-           			    if ( object3D is SkinnedMesh ) {
-				            //object3D.skeleton.update();
-			            }
+                object3D =>
+                {
+                    if (object3D is SkinnedMesh)
+                    {
+                        //object3D.skeleton.update();
+                    }
                 });
 
             camera.MatrixWorldInverse = camera.MatrixWorld.GetInverse();
 
             this._projScreenMatrix = camera.ProjectionMatrix * camera.MatrixWorldInverse;
-       //     this._frustum = new Matrix4().FromMatrix(this._projScreenMatrix); // TODO
+            //     this._frustum = new Matrix4().FromMatrix(this._projScreenMatrix); // TODO
 
 
             this.Lights.Clear();
@@ -710,30 +729,38 @@
 
             if (this.SortObjects)
             {
-                this.opaqueObjects.Sort( (a, b) =>
-                        {
-		                    if ( a.material.Id != b.material.Id ) {
-			                    return b.material.Id - a.material.Id;
-		                    } else if ( a.z != b.z ) {
-			                    return (int)(b.z - a.z);
-		                    } else {
-			                    return (int)(a.id - b.id);
-		                    }
-                        });
+                this.opaqueObjects.Sort((a, b) =>
+                       {
+                           if (a.material.Id != b.material.Id)
+                           {
+                               return b.material.Id - a.material.Id;
+                           }
+                           else if (a.z != b.z)
+                           {
+                               return (int)(b.z - a.z);
+                           }
+                           else
+                           {
+                               return (int)(a.id - b.id);
+                           }
+                       });
 
-                this.transparentObjects.Sort( (a, b) =>
-                        {
-		                    if ( a.z != b.z ) {
-			                    return (int)(a.z - b.z);
-		                    } else {
-			                    return (int)(a.id - b.id);
-		                    }
-                        });
+                this.transparentObjects.Sort((a, b) =>
+                       {
+                           if (a.z != b.z)
+                           {
+                               return (int)(a.z - b.z);
+                           }
+                           else
+                           {
+                               return (int)(a.id - b.id);
+                           }
+                       });
             }
 
             // custom render plugins (pre pass)
 
-            this.shadowMapPlugin.Render( scene, camera );
+            this.shadowMapPlugin.Render(scene, camera);
 
             //
             this.Info.render.Calls = 0;
@@ -795,16 +822,16 @@
 
             // custom render plugins (post pass)
 
-            this.spritePlugin.Render( scene, camera );
-            this.lensFlarePlugin.Render( scene, camera, this._currentWidth, this._currentHeight );
+            this.spritePlugin.Render(scene, camera);
+            this.lensFlarePlugin.Render(scene, camera, this._currentWidth, this._currentHeight);
 
 
             // Generate mipmap if we're using any kind of mipmap filtering
-            if ((null != renderTarget) && renderTarget.GenerateMipmaps 
+            if ((null != renderTarget) && renderTarget.GenerateMipmaps
                                        && renderTarget.MinFilter != Three.NearestFilter
-                                       && renderTarget.MinFilter != Three.LinearFilter) 
+                                       && renderTarget.MinFilter != Three.LinearFilter)
             {
-                this.UpdateRenderTargetMipmap( renderTarget );
+                this.UpdateRenderTargetMipmap(renderTarget);
             }
 
             // Ensure depth buffer writing is enabled so it can be cleared on next render
@@ -851,7 +878,7 @@
         /// </summary>
         public void SetDefaultGlState()
         {
-            GL.ClearColor(0, 0, 0, 1); 
+            GL.ClearColor(0, 0, 0, 1);
             GL.ClearDepth(1.0f);
             GL.ClearStencil(0);
 
@@ -864,7 +891,7 @@
 
             GL.Enable(EnableCap.Blend);
             GL.BlendEquation(BlendEquationMode.FuncAdd);
-            GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
+            GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
 
             GL.Viewport(this._viewportX, this._viewportY, this._viewportWidth, this._viewportHeight);
 
@@ -959,7 +986,7 @@
         /// </summary>
         /// <param name="material"></param>
         /// <returns></returns>
-        private static bool AreCustomAttributesDirty(IAttributes material )
+        private static bool AreCustomAttributesDirty(IAttributes material)
         {
             if (null == material) return false;
 
@@ -983,7 +1010,7 @@
         /// 
         /// </summary>
         /// <param name="material"></param>
-        private static void ClearCustomAttributes(IAttributes material )
+        private static void ClearCustomAttributes(IAttributes material)
         {
             if (null == material) return;
 
@@ -1004,23 +1031,23 @@
         /// <param name="object3D"></param>
         private void RemoveObject(Object3D object3D)
         {
-		    if ( object3D is Mesh  ||
-			     object3D is PointCloud ||
-			     object3D is Line )
-		    {
+            if (object3D is Mesh ||
+                 object3D is PointCloud ||
+                 object3D is Line)
+            {
                 _webglObjects[object3D.id].Clear();
                 _webglObjects[object3D.id] = null;
-		    }
+            }
             else if (object3D is ImmediateRenderObject || ((ImmediateRenderObject)object3D).immediateRenderCallback != null)
-		    {
-		        RemoveInstances(_webglObjectsImmediate, object3D);
-		    }
+            {
+                RemoveInstances(_webglObjectsImmediate, object3D);
+            }
 
-		    object3D.__webglInit = false;
-		    object3D._modelViewMatrix = null;
+            object3D.__webglInit = false;
+            object3D._modelViewMatrix = null;
             object3D._normalMatrix = null;
 
-		    object3D.__webglActive = false;
+            object3D.__webglActive = false;
         }
 
         /// <summary>
@@ -1030,14 +1057,15 @@
         /// <param name="object3D"></param>
         private void RemoveInstances(IList<WebGlObject> objlist, Object3D object3D)
         {
-		    for ( var o = objlist.Count - 1; o >= 0; o -- )
+            for (var o = objlist.Count - 1; o >= 0; o--)
             {
-			    if ( objlist[ o ].object3D == object3D ) {
+                if (objlist[o].object3D == object3D)
+                {
 
-				    objlist.RemoveAt( o );
-			    }
-		    }
-	    }
+                    objlist.RemoveAt(o);
+                }
+            }
+        }
 
         /// <summary>
         /// 
@@ -1046,34 +1074,34 @@
         /// <param name="object3D"></param>
         private static void InitLineBuffers(Geometry geometry, Object3D object3D)
         {
-		    var nvertices = geometry.Vertices.Count;
+            var nvertices = geometry.Vertices.Count;
 
-		    geometry.__vertexArray = new float[ nvertices * 3 ];
-		    geometry.__colorArray = new float[ nvertices * 3 ];
-		    geometry.__lineDistanceArray = new float[ nvertices * 1 ];
+            geometry.__vertexArray = new float[nvertices * 3];
+            geometry.__colorArray = new float[nvertices * 3];
+            geometry.__lineDistanceArray = new float[nvertices * 1];
 
-		    geometry.__webglLineCount = nvertices;
+            geometry.__webglLineCount = nvertices;
 
             InitCustomAttributes(geometry, object3D);
         }
 
         // Reset
 
-	    public void ResetGlState ()
+        public void ResetGlState()
         {
-		    this._currentProgram = null;
-		    this._currentCamera = null;
+            this._currentProgram = null;
+            this._currentCamera = null;
 
-		    this._oldBlending = - 1;
-		    this._oldDepthTest = null;
-		    this._oldDepthWrite = null;
-		    this._oldDoubleSided = - 1;
-		    this._oldFlipSided = - 1;
-		    this._currentGeometryGroupHash = - 1;
-		    this._currentMaterialId = - 1;
+            this._oldBlending = -1;
+            this._oldDepthTest = null;
+            this._oldDepthWrite = null;
+            this._oldDoubleSided = -1;
+            this._oldFlipSided = -1;
+            this._currentGeometryGroupHash = -1;
+            this._currentMaterialId = -1;
 
-		    this._lightsNeedUpdate = true;
-	    }
+            this._lightsNeedUpdate = true;
+        }
 
         // Buffer allocation
 
@@ -1109,16 +1137,16 @@
         /// <param name="object3D"></param>
         private static void InitParticleBuffers(Geometry geometry, Object3D object3D)
         {
-		    var nvertices = geometry.Vertices.Count;
+            var nvertices = geometry.Vertices.Count;
 
-		    geometry.__vertexArray = new float[ nvertices * 3 ];
-		    geometry.__colorArray = new float[ nvertices * 3 ];
+            geometry.__vertexArray = new float[nvertices * 3];
+            geometry.__colorArray = new float[nvertices * 3];
 
-		    geometry.__sortArray = new Hashtable();
+            geometry.__sortArray = new Hashtable();
 
-		    geometry.__webglParticleCount = nvertices;
+            geometry.__webglParticleCount = nvertices;
 
-		    InitCustomAttributes ( geometry, object3D );
+            InitCustomAttributes(geometry, object3D);
         }
 
         /// <summary>
@@ -1128,21 +1156,22 @@
         /// <param name="object3D"></param>
         private static void InitCustomAttributes(Geometry geometry, Object3D object3D)
         {
-		    var nvertices = geometry.Vertices.Count;
+            var nvertices = geometry.Vertices.Count;
 
             if (object3D.Material is IAttributes)
             {
                 var material = object3D.Material as IAttributes;
 
-			    if ( geometry.__webglCustomAttributesList == null ) {
+                if (geometry.__webglCustomAttributesList == null)
+                {
                     geometry.__webglCustomAttributesList = new List<Shaders.Attribute>();
-			    }
+                }
 
                 foreach (var a in material.Attributes)
-			    {
+                {
                     var attribute = material.Attributes[a.Key];
 
-                    if (!attribute.ContainsKey("__webglInitialized") || attribute.ContainsKey("createUniqueBuffers")) 
+                    if (!attribute.ContainsKey("__webglInitialized") || attribute.ContainsKey("createUniqueBuffers"))
                     {
                         attribute["__webglInitialized"] = true;
 
@@ -1168,9 +1197,9 @@
                         attribute["needsUpdate"] = true;
                     }
 
-			        geometry.__webglCustomAttributesList.Add(attribute);
-			    }
-		    }
+                    geometry.__webglCustomAttributesList.Add(attribute);
+                }
+            }
         }
 
         private readonly Dictionary<int, List<GeometryGroup>> geometryGroups = new Dictionary<int, List<GeometryGroup>>();
@@ -1244,11 +1273,11 @@
 
             if (!this.geometryGroups.ContainsKey(geometry.Id) || geometry.GroupsNeedUpdate)
             {
-     //     	    delete this._webglObjects[object3D.id].;
+                //             delete this._webglObjects[object3D.id].;
                 this._webglObjects.Remove(object3D.id);
 
                 this.geometryGroups[geometry.Id] = this.MakeGroups(geometry, material is MeshFaceMaterial);
-                
+
                 geometry.GroupsNeedUpdate = false;
             }
 
@@ -1388,7 +1417,8 @@
             var object3D = sender as Object3D;
             Debug.Assert(null != object3D);
 
-            object3D.Traverse(child => {
+            object3D.Traverse(child =>
+            {
                 child.Removed -= this.OnObjectRemoved;
                 RemoveObject(child);
             });
@@ -1396,7 +1426,7 @@
 
         void OnGeometryDispose(object sender, EventArgs e)
         {
-		    var geometry = sender as BaseGeometry;
+            var geometry = sender as BaseGeometry;
             Debug.Assert(null != geometry);
 
             geometry.Disposed -= this.OnGeometryDispose;
@@ -1406,24 +1436,24 @@
 
         void OnTextureDispose(object sender, EventArgs e)
         {
-      		var texture = sender as Texture;
+            var texture = sender as Texture;
             Debug.Assert(null != texture);
 
             texture.Disposed -= this.OnTextureDispose;
 
-		    this.DeallocateTexture( texture );
+            this.DeallocateTexture(texture);
 
-		    this.Info.memory.Textures --;
+            this.Info.memory.Textures--;
         }
 
         void OnMaterialDispose(object sender, EventArgs e)
         {
-		    var material = sender as Material;
+            var material = sender as Material;
             Debug.Assert(null != material);
 
             material.Disposed -= this.OnMaterialDispose;
 
-		    this.DeallocateMaterial( material );
+            this.DeallocateMaterial(material);
         }
 
         /// <summary>
@@ -1471,7 +1501,7 @@
                     this.DeleteBuffers(geometry);
                 }
             }
-        
+
             // TOFIX: Workaround for deleted geometry being currently bound
 
             _currentGeometryGroupHash = -1;
@@ -1479,7 +1509,7 @@
 
         // Buffer deallocation
 
-	    public void DeleteBuffers (BaseGeometry geometry)
+        public void DeleteBuffers(BaseGeometry geometry)
         {
             GL.DeleteBuffer(geometry.__webglVertexBuffer);
             GL.DeleteBuffer(geometry.__webglNormalBuffer);
@@ -1515,28 +1545,30 @@
 
             // custom attributes
 
-		    if ( geometry.__webglCustomAttributesList != null ) {
+            if (geometry.__webglCustomAttributesList != null)
+            {
 
-			    foreach ( var attribute in geometry.__webglCustomAttributesList ) {
+                foreach (var attribute in geometry.__webglCustomAttributesList)
+                {
 
                     var buffer = attribute["buffer"] as Hashtable;
                     var id = (int)buffer["id"];
 
-				    GL.DeleteBuffer(id);
-			    }
+                    GL.DeleteBuffer(id);
+                }
 
-			    geometry.__webglCustomAttributesList.Clear();
-		        geometry.__webglCustomAttributesList = null;
-		    }
+                geometry.__webglCustomAttributesList.Clear();
+                geometry.__webglCustomAttributesList = null;
+            }
 
-		    this.Info.memory.Geometries --;
+            this.Info.memory.Geometries--;
         }
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="texture"></param>
-        public void DeallocateTexture (Texture texture )
+        public void DeallocateTexture(Texture texture)
         {
             //if ( texture.Image && texture.Image.__webglTextureCube ) {
 
@@ -1550,16 +1582,16 @@
             //}
             //else
             {
-			    // 2D texture
+                // 2D texture
 
-			    if ( texture.__webglInit == false ) return;
+                if (texture.__webglInit == false) return;
 
-		        GL.DeleteTexture(texture.__webglTexture);
+                GL.DeleteTexture(texture.__webglTexture);
 
                 texture.__webglTexture = -1;
                 texture.__webglInit = false;
-		    }
-	    }
+            }
+        }
 
 
         /// <summary>
@@ -1569,7 +1601,7 @@
         /// <param name="camera"></param>
         private void UnprojectObject(Scene scene, Object3D object3D, Camera camera)
         {
- 		    var projectionMatrixInverse = new Matrix4();
+            var projectionMatrixInverse = new Matrix4();
 
             //return function ( vector, camera ) {
 
@@ -1577,7 +1609,7 @@
             //    _projScreenMatrix= camera.matrixWorld * projectionMatrixInverse;
 
             //    return vector.applyProjection( _projScreenMatrix );
-       }
+        }
 
         /// <summary>
         /// </summary>
@@ -1586,7 +1618,7 @@
         /// <param name="camera"></param>
         private void ProjectObject(Scene scene, Object3D object3D, Camera camera)
         {
-           
+
             if (object3D.Visible == false)
             {
                 return;
@@ -1678,7 +1710,7 @@
             var attributesLocation = program.Attributes;
 
             var updateBuffers = false;
-            
+
             var wireframeBit = 0;
             var frameable = material as IWireframe;
             if (frameable != null)
@@ -1713,10 +1745,10 @@
             }
             else
             {
-            //    if (object3D.morphTargetBase)
-            //    {
-            //        this.setupMorphTargets(material, geometryGroup, object3D);
-            //    }
+                //    if (object3D.morphTargetBase)
+                //    {
+                //        this.setupMorphTargets(material, geometryGroup, object3D);
+                //    }
             }
 
             if (updateBuffers)
@@ -1727,9 +1759,10 @@
 
                 if (null != geometryGroup.__webglCustomAttributesList)
                 {
-                    for (var i = 0; i < geometryGroup.__webglCustomAttributesList.Count; i ++ ) {
+                    for (var i = 0; i < geometryGroup.__webglCustomAttributesList.Count; i++)
+                    {
 
-                        var attribute = geometryGroup.__webglCustomAttributesList[ i ];
+                        var attribute = geometryGroup.__webglCustomAttributesList[i];
 
                         var buffer = attribute["buffer"] as Hashtable;
                         var belongsTo = buffer["belongsToAttribute"] as string;
@@ -1892,7 +1925,7 @@
 
                 GL.DrawArrays(mode, 0, geometryGroup.__webglLineCount);
 
-                this.Info.render.Calls ++;
+                this.Info.render.Calls++;
 
             }
             else if (object3D is PointCloud)
@@ -1901,7 +1934,7 @@
 
                 GL.DrawArrays(BeginMode.Points, 0, geometryGroup.__webglParticleCount);
 
-                this.Info.render.Calls ++;
+                this.Info.render.Calls++;
                 this.Info.render.Points += geometryGroup.__webglParticleCount;
             }
         }
@@ -1913,18 +1946,18 @@
         /// <param name="program"></param>
         /// <param name="geometry"></param>
         /// <param name="startIndex"></param>
-        private void SetupVertexAttributes(Material material, WebGlProgram program, BufferGeometry geometry, int startIndex )
+        private void SetupVertexAttributes(Material material, WebGlProgram program, BufferGeometry geometry, int startIndex)
         {
             var geometryAttributes = geometry.Attributes;
 
             var programAttributes = program.Attributes;
             var programAttributesKeys = program.AttributesKeys;
 
-            foreach (var key in programAttributesKeys) 
+            foreach (var key in programAttributesKeys)
             {
                 var programAttribute = programAttributes[key];
 
-                if (null != programAttribute && geometryAttributes.ContainsKey(key)) 
+                if (null != programAttribute && geometryAttributes.ContainsKey(key))
                 {
                     if (null != geometryAttributes[key] as BufferAttribute<float>)
                     {
@@ -1933,7 +1966,7 @@
 
                         Debug.Assert(attributeItem.buffer > 0, "buffer has not been initialized");
 
-                        GL.BindBuffer( BufferTarget.ArrayBuffer, attributeItem.buffer );
+                        GL.BindBuffer(BufferTarget.ArrayBuffer, attributeItem.buffer);
                         this.EnableAttribute((int)programAttribute);
                         GL.VertexAttribPointer((int)programAttribute, attributeSize, VertexAttribPointerType.Float, false, 0, startIndex * attributeSize * sizeof(float));
                     }
@@ -1960,7 +1993,7 @@
                         GL.BindBuffer(BufferTarget.ArrayBuffer, attributeItem.buffer);
                         this.EnableAttribute((int)programAttribute);
                         GL.VertexAttribPointer((int)programAttribute, attributeSize, VertexAttribPointerType.UnsignedShort, false, 0, startIndex * attributeSize * sizeof(ushort));
-                    } 
+                    }
                     //else if ( material.defaultAttributeValues ) 
                     //{
                     //    if ( material.defaultAttributeValues[ attributeName ].length == 2 )
@@ -1974,8 +2007,8 @@
                 }
             }
 
-		    this.DisableUnusedAttributes();
-	    }
+            this.DisableUnusedAttributes();
+        }
 
         /// <summary>
         /// 
@@ -1995,169 +2028,183 @@
 
             var program = this.SetProgram(camera, lights, fog, material, object3D);
 
-		    //var programAttributes = program.Attributes;
+            //var programAttributes = program.Attributes;
 
             var updateBuffers = false;
             var wireframeBit = 0;
             if (material is IWireframe)
                 wireframeBit = ((IWireframe)material).Wireframe ? 1 : 0;
-			var geometryHash = ( geometry.Id * 0xffffff ) + ( program.Id * 2 ) + wireframeBit;
+            var geometryHash = (geometry.Id * 0xffffff) + (program.Id * 2) + wireframeBit;
 
-		    if ( geometryHash != this._currentGeometryGroupHash ) 
+            if (geometryHash != this._currentGeometryGroupHash)
             {
-			    this._currentGeometryGroupHash = geometryHash;
-			    updateBuffers = true;
-		    }
+                this._currentGeometryGroupHash = geometryHash;
+                updateBuffers = true;
+            }
 
-		    if ( updateBuffers ) 
+            if (updateBuffers)
             {
-			    this.InitAttributes();
-		    }
+                this.InitAttributes();
+            }
 
-		    // render mesh
+            // render mesh
 
-		    if ( object3D is Mesh )
-		    {
+            if (object3D is Mesh)
+            {
                 var mode = BeginMode.Lines;
-		        var wireframe = material as IWireframe;
-		        if (wireframe != null) mode = wireframe.Wireframe ? BeginMode.Lines : BeginMode.Triangles;
+                var wireframe = material as IWireframe;
+                if (wireframe != null) mode = wireframe.Wireframe ? BeginMode.Lines : BeginMode.Triangles;
 
-                if (geometry.Attributes.ContainsKey("index")) 
+                if (geometry.Attributes.ContainsKey("index"))
                 {
                     var index = geometry.Attributes["index"] as IBufferAttribute;
                     Debug.Assert(null != index);
 
-				    // indexed triangles
+                    // indexed triangles
 
-                    DrawElementsType type; 
+                    DrawElementsType type;
                     var size = 0;
 
-                    if (index.Type == typeof(uint)) {
+                    if (index.Type == typeof(uint))
+                    {
                         type = DrawElementsType.UnsignedInt;
-					    size = 4;
-				    } else {
+                        size = 4;
+                    }
+                    else
+                    {
                         type = DrawElementsType.UnsignedShort;
-					    size = 2;
-				    }
+                        size = 2;
+                    }
 
-				    var offsets = geometry.Offsets;
+                    var offsets = geometry.Offsets;
 
-				    if ( offsets.Count == 0 ) {
+                    if (offsets.Count == 0)
+                    {
 
-					    if ( updateBuffers ) {
+                        if (updateBuffers)
+                        {
 
                             this.SetupVertexAttributes(material, program, geometry, 0);
-						    GL.BindBuffer( BufferTarget.ElementArrayBuffer, index.buffer );
+                            GL.BindBuffer(BufferTarget.ElementArrayBuffer, index.buffer);
 
-					    }
+                        }
 
                         GL.DrawElements(mode, index.length, type, 0);
 
-                        this.Info.render.Calls ++;
+                        this.Info.render.Calls++;
                         this.Info.render.Vertices += index.length; // not really true, here vertices can be shared
                         this.Info.render.Faces += index.length / 3;
 
-				    } else {
+                    }
+                    else
+                    {
 
-					    // if there is more than 1 chunk
-					    // must set attribute pointers to use new offsets for each chunk
-					    // even if geometry and materials didn"t change
+                        // if there is more than 1 chunk
+                        // must set attribute pointers to use new offsets for each chunk
+                        // even if geometry and materials didn"t change
 
-					    updateBuffers = true;
+                        updateBuffers = true;
 
-					    for ( var i = 0; i <  offsets.Count;  i ++ ) {
+                        for (var i = 0; i < offsets.Count; i++)
+                        {
 
-						    var startIndex = offsets[ i ].Index;
+                            var startIndex = offsets[i].Index;
 
-						    if ( updateBuffers ) {
+                            if (updateBuffers)
+                            {
 
                                 this.SetupVertexAttributes(material, program, geometry, startIndex);
-							    GL.BindBuffer( BufferTarget.ElementArrayBuffer, index.buffer );
+                                GL.BindBuffer(BufferTarget.ElementArrayBuffer, index.buffer);
 
-						    }
+                            }
 
-						    // render indexed triangles
+                            // render indexed triangles
 
                             GL.DrawElements(mode, offsets[i].Count, type, offsets[i].Start * size);
 
-                            this.Info.render.Calls ++;
-                            this.Info.render.Vertices += offsets[ i ].Count; // not really true, here vertices can be shared
-                            this.Info.render.Faces += offsets[ i ].Count / 3;
+                            this.Info.render.Calls++;
+                            this.Info.render.Vertices += offsets[i].Count; // not really true, here vertices can be shared
+                            this.Info.render.Faces += offsets[i].Count / 3;
 
-					    }
+                        }
 
-				    }
+                    }
 
-			    } else {
+                }
+                else
+                {
 
-				    // non-indexed triangles
+                    // non-indexed triangles
 
-				    if ( updateBuffers ) {
+                    if (updateBuffers)
+                    {
                         this.SetupVertexAttributes(material, program, geometry, 0);
-				    }
+                    }
 
                     var position = geometry.Attributes["position"] as BufferAttribute<float>;
 
-				    // render non-indexed triangles
+                    // render non-indexed triangles
 
-				    GL.DrawArrays( BeginMode.Triangles, 0, position.length );
+                    GL.DrawArrays(BeginMode.Triangles, 0, position.length);
 
-                    this.Info.render.Calls ++;
+                    this.Info.render.Calls++;
                     this.Info.render.Vertices += position.length;
                     this.Info.render.Faces += position.length / 3;
-			    }
+                }
 
-		    } 
-            else if ( object3D is PointCloud ) 
+            }
+            else if (object3D is PointCloud)
             {
-			    // render particles
+                // render particles
 
-			    if ( updateBuffers ) {
+                if (updateBuffers)
+                {
                     this.SetupVertexAttributes(material, program, geometry, 0);
-			    }
+                }
 
                 var position = geometry.Attributes["position"] as BufferAttribute<float>;
 
-			    // render particles
-			    GL.DrawArrays( BeginMode.Points, 0, position.length );
+                // render particles
+                GL.DrawArrays(BeginMode.Points, 0, position.length);
 
-                this.Info.render.Calls ++;
+                this.Info.render.Calls++;
                 this.Info.render.Points += position.length / 3;
-		    } 
-            else if ( object3D is Line ) 
+            }
+            else if (object3D is Line)
             {
                 var mode = (((Line)object3D).Mode == Three.LineStrip) ? BeginMode.LineStrip : BeginMode.Lines;
 
-                this.SetLineWidth( ((LineBasicMaterial)material).Linewidth );
+                this.SetLineWidth(((LineBasicMaterial)material).Linewidth);
 
 
                 if (geometry.Attributes.ContainsKey("index"))
                 {
                     var index = geometry.Attributes["index"];
 
-				    // indexed lines
+                    // indexed lines
 
-                    DrawElementsType type; 
+                    DrawElementsType type;
                     var size = 0;
 
                     throw new NotImplementedException();
 
-				    if ( index is short[] ) 
+                    if (index is short[])
                     {
                         type = DrawElementsType.UnsignedInt;
-					    size = 4;
-				    } 
+                        size = 4;
+                    }
                     else
                     {
                         type = DrawElementsType.UnsignedShort;
-					    size = 2;
-				    }
+                        size = 2;
+                    }
 
-				    var offsets = geometry.Offsets;
+                    var offsets = geometry.Offsets;
 
-				    if ( offsets.Count == 0 ) {
+                    if (offsets.Count == 0)
+                    {
 
-					    if ( updateBuffers )
+                        if (updateBuffers)
                         {
                             this.SetupVertexAttributes(material, program, geometry, 0);
 
@@ -2171,27 +2218,29 @@
                                 GL.BindBuffer(BufferTarget.ElementArrayBuffer, ((BufferAttribute<float>)index).buffer);
                         }
 
-				        var length = ((IBufferAttribute)index).length;
+                        var length = ((IBufferAttribute)index).length;
 
                         GL.DrawElements(mode, length, type, 0); // 2 bytes per Uint16Array
 
-                        this.Info.render.Calls ++;
+                        this.Info.render.Calls++;
                         this.Info.render.Vertices += length; // not really true, here vertices can be shared
 
-				    } else {
+                    }
+                    else
+                    {
 
-					    // if there is more than 1 chunk
-					    // must set attribute pointers to use new offsets for each chunk
-					    // even if geometry and materials didn"t change
+                        // if there is more than 1 chunk
+                        // must set attribute pointers to use new offsets for each chunk
+                        // even if geometry and materials didn"t change
 
-					    if ( offsets.Count > 1 ) updateBuffers = true;
+                        if (offsets.Count > 1) updateBuffers = true;
 
-					    for ( var i = 0; i < offsets.Count;  i ++ )
+                        for (var i = 0; i < offsets.Count; i++)
                         {
 
-						    var startIndex = offsets[ i ].Index;
+                            var startIndex = offsets[i].Index;
 
-						    if ( updateBuffers ) 
+                            if (updateBuffers)
                             {
                                 this.SetupVertexAttributes(material, program, geometry, startIndex);
 
@@ -2203,36 +2252,39 @@
                                     GL.BindBuffer(BufferTarget.ElementArrayBuffer, ((BufferAttribute<float>)index).buffer);
                             }
 
-						    // render indexed lines
+                            // render indexed lines
 
-						    GL.DrawElements( mode, offsets[ i ].Count, type, offsets[ i ].Start * size ); // 2 bytes per Uint16Array
+                            GL.DrawElements(mode, offsets[i].Count, type, offsets[i].Start * size); // 2 bytes per Uint16Array
 
-                            this.Info.render.Calls ++;
-                            this.Info.render.Vertices += offsets[ i ].Count; // not really true, here vertices can be shared
-					    }
+                            this.Info.render.Calls++;
+                            this.Info.render.Vertices += offsets[i].Count; // not really true, here vertices can be shared
+                        }
 
-				    }
+                    }
 
-			    } else {
+                }
+                else
+                {
 
-				    // non-indexed lines
+                    // non-indexed lines
 
-				    if ( updateBuffers ) {
+                    if (updateBuffers)
+                    {
                         this.SetupVertexAttributes(material, program, geometry, 0);
-				    }
+                    }
 
                     var position = geometry.Attributes["position"] as BufferAttribute<float>;
 
-			        var array = position.Array;
+                    var array = position.Array;
 
                     GL.DrawArrays(mode, 0, array.Length / 3);
 
-			        this.Info.render.Calls ++;
+                    this.Info.render.Calls++;
                     this.Info.render.Points += array.Length / 3;
-			    }
+                }
 
-		    }
-           
+            }
+
         }
 
         /// <summary>
@@ -2244,13 +2296,13 @@
         /// <param name="webGlObject"></param>
         private void RenderImmediateObject(Camera camera, IEnumerable<Light> lights, Fog fog, Material material, WebGlObject webGlObject)
         {
-  	        var object3D = webGlObject.object3D;
+            var object3D = webGlObject.object3D;
 
             var program = this.SetProgram(camera, lights, fog, material, object3D);
 
-		    this._currentGeometryGroupHash = - 1;
+            this._currentGeometryGroupHash = -1;
 
-		    this.SetMaterialFaces( material );
+            this.SetMaterialFaces(material);
 
             //if ( webGlObject.immediateRenderCallback ) {
             //    webGlObject.immediateRenderCallback( program, _gl, _frustum );
@@ -2384,12 +2436,14 @@
         /// <returns></returns>
         private int AllocateBones(Object3D object3D)
         {
-            if ( this.supportsBoneTextures && null != object3D && /*null != object3D.skeleton && object3D.skeleton.useVertexTexture*/ false)
+            if (this.supportsBoneTextures && null != object3D && /*null != object3D.skeleton && object3D.skeleton.useVertexTexture*/ false)
             {
 
-            return 1024;
+                return 1024;
 
-            } else {
+            }
+            else
+            {
 
                 // default for when object is not specified
                 // ( for example when prebuilding shader
@@ -2450,19 +2504,19 @@
 
                 if (light is DirectionalLight)
                 {
-                    dirLights ++;
+                    dirLights++;
                 }
                 if (light is PointLight)
                 {
-                    pointLights ++;
+                    pointLights++;
                 }
                 if (light is SpotLight)
                 {
-                    spotLights ++;
+                    spotLights++;
                 }
                 if (light is HemisphereLight)
                 {
-                    hemiLights ++;
+                    hemiLights++;
                 }
             }
 
@@ -2493,7 +2547,7 @@
 
                 if (light is SpotLight)
                 {
-                    maxShadows ++;
+                    maxShadows++;
                 }
                 if (light is DirectionalLight && !((DirectionalLight)light).shadowCascade)
                 {
@@ -2502,13 +2556,13 @@
             }
             return maxShadows;
         }
-        
+
         /// <summary>
         /// 
         /// </summary>
         /// <param name="material"></param>
         /// <returns></returns>
-        private static bool materialNeedsSmoothNormals (Material material ) 
+        private static bool materialNeedsSmoothNormals(Material material)
         {
             if (null == material) return false;
 
@@ -2633,7 +2687,7 @@
 
                 GL.DeleteProgram(program);
 
-                this.Info.memory.Programs --;
+                this.Info.memory.Programs--;
             }
         }
 
@@ -2642,7 +2696,7 @@
         /// </summary>
         private void DisableUnusedAttributes()
         {
-            for (var i = 0; i < this._enabledAttributes.Length; i ++)
+            for (var i = 0; i < this._enabledAttributes.Length; i++)
             {
                 if (this._enabledAttributes[i] != this._newAttributes[i])
                 {
@@ -2716,7 +2770,7 @@
         /// </summary>
         private void InitAttributes()
         {
-            for (var i = 0; i < this._newAttributes.Length; i ++)
+            for (var i = 0; i < this._newAttributes.Length; i++)
             {
                 this._newAttributes[i] = 0;
             }
@@ -2733,7 +2787,7 @@
             var attributesKeys = geometry.AttributesKeys;
 
             foreach (var key in attributesKeys)
-		    {
+            {
                 var attribute = attributes[key] as IBufferAttribute;
                 Debug.Assert(null != attribute, "casting to IBufferAttribute failed");
 
@@ -2746,7 +2800,7 @@
                     attribute.needsUpdate = true;
                 }
 
-                if (attribute.needsUpdate) 
+                if (attribute.needsUpdate)
                 {
                     var bufferType = (key == "index") ? BufferTarget.ElementArrayBuffer : BufferTarget.ArrayBuffer;
 
@@ -2763,9 +2817,9 @@
                         GL.BufferData(bufferType, (IntPtr)(attribute.length * sizeof(uint)), (uint[])array, hint);
 
                     attribute.needsUpdate = false;
-	            }
-		    }
-	    }
+                }
+            }
+        }
 
         /// <summary>
         /// 
@@ -2816,10 +2870,10 @@
 
             if (!string.IsNullOrEmpty(shaderId))
             {
-                var shader =  (Shader)this.shaderLib[shaderId];
+                var shader = (Shader)this.shaderLib[shaderId];
 
                 material["__webglShader"] = new WebGlShader();
-                
+
                 // TODO: good enough as Clone?
                 ((WebGlShader)material["__webglShader"]).Uniforms = new Uniforms();
                 foreach (var e in shader.Uniforms)
@@ -2859,7 +2913,7 @@
                                  {
                                      { "precision", this._precision },
                                      { "supportsVertexTextures", this.supportsVertexTextures },
-                                     { "fog", fog },                 
+                                     { "fog", fog },
                                      { "logarithmicDepthBuffer", this._logarithmicDepthBuffer },
                                      { "maxBones", maxBones },
                                      //{ "useVertexTexture", (this.supportsBoneTextures) && (null != object3D)
@@ -2921,7 +2975,7 @@
                 parameters.Add("useFog", pointCloudMaterial.Fog);
                 parameters.Add("vertexColors", pointCloudMaterial.VertexColors);
                 parameters.Add("alphaTest", pointCloudMaterial.AlphaTest);
-                
+
                 parameters.Add("sizeAttenuation", pointCloudMaterial.SizeAttenuation);
             }
 
@@ -2946,7 +3000,7 @@
                 parameters.Add("skinning", meshLambertMaterial.Skinning);
                 parameters.Add("morphTargets", meshLambertMaterial.MorphTargets);
                 parameters.Add("alphaTest", meshLambertMaterial.AlphaTest);
-                
+
                 parameters.Add("wrapAround", meshLambertMaterial.WrapAround);
                 parameters.Add("morphNormals", meshLambertMaterial.MorphNormals);
             }
@@ -2964,7 +3018,7 @@
                 parameters.Add("skinning", meshPhongMaterial.Skinning);
                 parameters.Add("morphTargets", meshPhongMaterial.MorphTargets);
                 parameters.Add("alphaTest", meshPhongMaterial.AlphaTest);
-                
+
                 parameters.Add("metal", meshPhongMaterial.Metal);
                 parameters.Add("wrapAround", meshPhongMaterial.WrapAround);
                 parameters.Add("morphNormals", meshPhongMaterial.MorphNormals);
@@ -2977,7 +3031,7 @@
             if (!string.IsNullOrEmpty(shaderId))
             {
                 chunks.Add(shaderId);
-            } 
+            }
             else
             {
                 if (null != shaderMaterial)
@@ -3013,7 +3067,7 @@
                 if (programInfo.Code == code)
                 {
                     program = programInfo;
-                    program.UsedTimes ++;
+                    program.UsedTimes++;
 
                     //Console.WriteLine("Reusing Shader Program {0}", programInfo.Id);
 
@@ -3035,13 +3089,13 @@
 
             var attributes = ((WebGlProgram)material["program"]).Attributes;
 
-            if (null != meshBasicMaterial && meshBasicMaterial.MorphTargets) 
+            if (null != meshBasicMaterial && meshBasicMaterial.MorphTargets)
             {
                 meshBasicMaterial.NumSupportedMorphTargets = 0;
 
                 var basis = "morphTarget";
 
-                for (var i = 0; i < this.maxMorphTargets; i ++ ) 
+                for (var i = 0; i < this.maxMorphTargets; i++)
                 {
                     var id = basis + i;
                     if ((int)attributes[id] >= 0)
@@ -3148,23 +3202,24 @@
             geometryGroup.__webglLineCount = nlines * 2;
 
             // custom Attributes
-            
-		    if (material is IAttributes &&  ((IAttributes)material).Attributes != null) 
+
+            if (material is IAttributes && ((IAttributes)material).Attributes != null)
             {
                 var attributesMaterial = material as IAttributes;
 
-			    if ( geometryGroup.__webglCustomAttributesList == null ) {
+                if (geometryGroup.__webglCustomAttributesList == null)
+                {
                     geometryGroup.__webglCustomAttributesList = new List<Shaders.Attribute>();
-			    }
+                }
 
                 foreach (var a in attributesMaterial.Attributes)
-			    {
-			        var originalAttribute = a.Value ;
+                {
+                    var originalAttribute = a.Value;
 
-				    // Do a shallow copy of the attribute object so different geometryGroup chunks use different
-				    // attribute buffers which are correctly indexed in the setMeshBuffers function
+                    // Do a shallow copy of the attribute object so different geometryGroup chunks use different
+                    // attribute buffers which are correctly indexed in the setMeshBuffers function
 
-				    var attribute = new ThreeCs.Renderers.Shaders.Attribute();
+                    var attribute = new ThreeCs.Renderers.Shaders.Attribute();
 
                     foreach (var entry in originalAttribute)
                     {
@@ -3173,16 +3228,16 @@
                         attribute[property] = originalAttribute[property];
                     }
 
-                    if (!attribute.ContainsKey("__webglInitialized") || attribute.ContainsKey("createUniqueBuffers")) 
+                    if (!attribute.ContainsKey("__webglInitialized") || attribute.ContainsKey("createUniqueBuffers"))
                     {
-					    attribute["__webglInitialized"] = true;
+                        attribute["__webglInitialized"] = true;
 
-					    var size = 1;   // "f" and "i"
+                        var size = 1;   // "f" and "i"
 
                         if ((string)attribute["type"] == "v2") size = 2;
-					    else if ( (string)attribute["type"] == "v3" ) size = 3;
-					    else if ( (string)attribute["type"] == "v4" ) size = 4;
-					    else if ( (string)attribute["type"] == "c"  ) size = 3;
+                        else if ((string)attribute["type"] == "v3") size = 3;
+                        else if ((string)attribute["type"] == "v4") size = 4;
+                        else if ((string)attribute["type"] == "c") size = 3;
 
                         attribute["size"] = size;
 
@@ -3200,10 +3255,10 @@
                         attribute["__original"] = originalAttribute;
                     }
 
-				    geometryGroup.__webglCustomAttributesList.Add( attribute );
-			    }
-		    }
-            
+                    geometryGroup.__webglCustomAttributesList.Add(attribute);
+                }
+            }
+
             geometryGroup.__inittedArrays = true;
         }
 
@@ -3233,7 +3288,7 @@
                     object value = uniform["value"];
                     location = uniformLocation.Location;
 
-            //        Console.WriteLine("loadUniformsGeneric: {0} {1} {2}", location, type, value);
+                    //        Console.WriteLine("loadUniformsGeneric: {0} {1} {2}", location, type, value);
 
                     switch (type)
                     {
@@ -3262,32 +3317,32 @@
 
                         case "1iv":
                             var oneiv = ((List<int>)value).ToArray();
-                            GL.Uniform1( location, oneiv.Length, oneiv );
+                            GL.Uniform1(location, oneiv.Length, oneiv);
                             break;
 
                         case "3iv":
                             var threeiv = ((List<int>)value).ToArray();
-                            GL.Uniform3( location, threeiv.Length, threeiv );
+                            GL.Uniform3(location, threeiv.Length, threeiv);
                             break;
 
                         case "1fv":
                             var onefv = ((List<float>)value).ToArray();
-                            GL.Uniform1( location, onefv.Length, onefv );
+                            GL.Uniform1(location, onefv.Length, onefv);
                             break;
 
                         case "2fv":
                             var twofv = ((List<float>)value).ToArray();
-                            GL.Uniform2( location, twofv.Length, twofv );
+                            GL.Uniform2(location, twofv.Length, twofv);
                             break;
 
                         case "3fv":
                             var threefv = ((List<float>)value).ToArray();
-                            GL.Uniform3( location, threefv.Length, threefv );
+                            GL.Uniform3(location, threefv.Length, threefv);
                             break;
 
                         case "4fv":
                             var fourfv = ((List<float>)value).ToArray();
-                            GL.Uniform4( location, fourfv.Length, fourfv );
+                            GL.Uniform4(location, fourfv.Length, fourfv);
                             break;
 
                         case "Matrix3fv":
@@ -3328,7 +3383,7 @@
                             var color = (Color)value;
                             GL.Uniform3(location, color.R / 255.0f, color.G / 255.0f, color.B / 255.0f);
                             break;
-                            
+
                         case "iv1":
                             // flat array of integers (JS or typed array)
                             var iv1 = ((List<int>)value).ToArray();
@@ -3347,139 +3402,139 @@
                             var fv1 = ((List<float>)value).ToArray();
                             GL.Uniform1(location, fv1.Length, fv1);
                             break;
-                                                            
+
                         case "fv":
                             // flat array of floats with 3 x N size (JS or typed array)
                             var fv = ((List<float>)value).ToArray();
                             GL.Uniform3(location, fv.Length / 3, fv);
                             break;
-                            /*
-                                                            case "v2v":
+                        /*
+                                                        case "v2v":
 
-                                                                // array of Three.Vector2
+                                                            // array of Three.Vector2
 
-                                                                if ( uniform._array == null ) {
+                                                            if ( uniform._array == null ) {
 
-                                                                    uniform._array = new Float32Array( 2 * value.length );
+                                                                uniform._array = new Float32Array( 2 * value.length );
 
-                                                                }
+                                                            }
 
-                                                                for ( var i = 0, il = value.length; i < il; i ++ ) {
+                                                            for ( var i = 0, il = value.length; i < il; i ++ ) {
 
-                                                                    offset = i * 2;
+                                                                offset = i * 2;
 
-                                                                    uniform._array[ offset ]   = value[ i ].x;
-                                                                    uniform._array[ offset + 1 ] = value[ i ].y;
+                                                                uniform._array[ offset ]   = value[ i ].x;
+                                                                uniform._array[ offset + 1 ] = value[ i ].y;
 
-                                                                }
+                                                            }
 
-                                                                GL.Uniform2fv( location, uniform._array );
+                                                            GL.Uniform2fv( location, uniform._array );
 
-                                                                break;
+                                                            break;
 
-                                                            case "v3v":
+                                                        case "v3v":
 
-                                                                // array of Three.Vector3
+                                                            // array of Three.Vector3
 
-                                                                if ( uniform._array == null ) {
+                                                            if ( uniform._array == null ) {
 
-                                                                    uniform._array = new Float32Array( 3 * value.length );
+                                                                uniform._array = new Float32Array( 3 * value.length );
 
-                                                                }
+                                                            }
 
-                                                                for ( var i = 0, il = value.length; i < il; i ++ ) {
+                                                            for ( var i = 0, il = value.length; i < il; i ++ ) {
 
-                                                                    offset = i * 3;
+                                                                offset = i * 3;
 
-                                                                    uniform._array[ offset ]   = value[ i ].x;
-                                                                    uniform._array[ offset + 1 ] = value[ i ].y;
-                                                                    uniform._array[ offset + 2 ] = value[ i ].z;
+                                                                uniform._array[ offset ]   = value[ i ].x;
+                                                                uniform._array[ offset + 1 ] = value[ i ].y;
+                                                                uniform._array[ offset + 2 ] = value[ i ].z;
 
-                                                                }
+                                                            }
 
-                                                                GL.Uniform3fv( location, uniform._array );
+                                                            GL.Uniform3fv( location, uniform._array );
 
-                                                                break;
+                                                            break;
 
-                                                            case "v4v":
+                                                        case "v4v":
 
-                                                                // array of Three.Vector4
+                                                            // array of Three.Vector4
 
-                                                                if ( uniform._array == null ) {
+                                                            if ( uniform._array == null ) {
 
-                                                                    uniform._array = new Float32Array( 4 * value.length );
+                                                                uniform._array = new Float32Array( 4 * value.length );
 
-                                                                }
+                                                            }
 
-                                                                for ( var i = 0, il = value.length; i < il; i ++ ) {
+                                                            for ( var i = 0, il = value.length; i < il; i ++ ) {
 
-                                                                    offset = i * 4;
+                                                                offset = i * 4;
 
-                                                                    uniform._array[ offset ]   = value[ i ].x;
-                                                                    uniform._array[ offset + 1 ] = value[ i ].y;
-                                                                    uniform._array[ offset + 2 ] = value[ i ].z;
-                                                                    uniform._array[ offset + 3 ] = value[ i ].w;
+                                                                uniform._array[ offset ]   = value[ i ].x;
+                                                                uniform._array[ offset + 1 ] = value[ i ].y;
+                                                                uniform._array[ offset + 2 ] = value[ i ].z;
+                                                                uniform._array[ offset + 3 ] = value[ i ].w;
 
-                                                                }
+                                                            }
 
-                                                                GL.Uniform4fv( location, uniform._array );
+                                                            GL.Uniform4fv( location, uniform._array );
 
-                                                                break;
+                                                            break;
 
-                                                            case "m3":
+                                                        case "m3":
 
-                                                                // single Three.Matrix3
-                                                                GL.UniformMatrix3fv( location, false, value.elements );
+                                                            // single Three.Matrix3
+                                                            GL.UniformMatrix3fv( location, false, value.elements );
 
-                                                                break;
+                                                            break;
 
-                                                            case "m3v":
+                                                        case "m3v":
 
-                                                                // array of Three.Matrix3
+                                                            // array of Three.Matrix3
 
-                                                                if ( uniform._array == null ) {
+                                                            if ( uniform._array == null ) {
 
-                                                                    uniform._array = new Float32Array( 9 * value.length );
+                                                                uniform._array = new Float32Array( 9 * value.length );
 
-                                                                }
+                                                            }
 
-                                                                for ( var i = 0, il = value.length; i < il; i ++ ) {
+                                                            for ( var i = 0, il = value.length; i < il; i ++ ) {
 
-                                                                    value[ i ].flattenToArrayOffset( uniform._array, i * 9 );
+                                                                value[ i ].flattenToArrayOffset( uniform._array, i * 9 );
 
-                                                                }
+                                                            }
 
-                                                                GL.UniformMatrix3fv( location, false, uniform._array );
+                                                            GL.UniformMatrix3fv( location, false, uniform._array );
 
-                                                                break;
+                                                            break;
 
-                                                            case "m4":
+                                                        case "m4":
 
-                                                                // single Three.Matrix4
-                                                                GL.UniformMatrix4fv( location, false, value.elements );
+                                                            // single Three.Matrix4
+                                                            GL.UniformMatrix4fv( location, false, value.elements );
 
-                                                                break;
+                                                            break;
 
-                                                            case "m4v":
+                                                        case "m4v":
 
-                                                                // array of Three.Matrix4
+                                                            // array of Three.Matrix4
 
-                                                                if ( uniform._array == null ) {
+                                                            if ( uniform._array == null ) {
 
-                                                                    uniform._array = new Float32Array( 16 * value.length );
+                                                                uniform._array = new Float32Array( 16 * value.length );
 
-                                                                }
+                                                            }
 
-                                                                for ( var i = 0, il = value.length; i < il; i ++ ) {
+                                                            for ( var i = 0, il = value.length; i < il; i ++ ) {
 
-                                                                    value[ i ].flattenToArrayOffset( uniform._array, i * 16 );
+                                                                value[ i ].flattenToArrayOffset( uniform._array, i * 16 );
 
-                                                                }
+                                                            }
 
-                                                                GL.UniformMatrix4fv( location, false, uniform._array );
+                                                            GL.UniformMatrix4fv( location, false, uniform._array );
 
-                                                                break;
-                            */
+                                                            break;
+                        */
                         case "t":
 
                             // single Three.Texture (2d or cube)
@@ -3500,7 +3555,7 @@
                             //} else if ( texture is WebGLRenderTargetCube ) {
                             //    this.setCubeTextureDynamic(texture, textureUnit);
                             //} else {
-                                this.SetTexture(texture, textureUnit);
+                            this.SetTexture(texture, textureUnit);
                             //}
 
                             break;
@@ -3564,7 +3619,7 @@
             location = uniformsLocation["normalMatrix"];
             if (location != null)
             {
-                GL.UniformMatrix3( (int)location, 1, false, object3D._normalMatrix.Elements);
+                GL.UniformMatrix3((int)location, 1, false, object3D._normalMatrix.Elements);
             }
         }
 
@@ -3625,7 +3680,7 @@
                     uvScaleMap = m.AlphaMap;
 
                 Uniforms.SetValue(uniforms, "envMap", m.EnvMap);
-                Uniforms.SetValue(uniforms, "flipEnvMap", ( m.EnvMap is WebGLRenderTargetCube ) ? 1 : - 1);
+                Uniforms.SetValue(uniforms, "flipEnvMap", (m.EnvMap is WebGLRenderTargetCube) ? 1 : -1);
 
                 if (this.gammaInput)
                 {
@@ -3658,7 +3713,7 @@
                     Uniforms.SetValue(uniforms, "bumpScale", m.BumpScale);
                 }
 
-                if (null != m.NormalMap) 
+                if (null != m.NormalMap)
                 {
                     Uniforms.SetValue(uniforms, "normalMap", m.NormalMap);
                     Uniforms.SetValue(uniforms, "normalScale", m.NormalScale);
@@ -3766,21 +3821,21 @@
                 {
                     GL.Enable(EnableCap.Blend);
                     GL.BlendEquation(BlendEquationMode.FuncAdd);
-                    GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.One);
+                    GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.One);
                 }
                 else if (blending == Three.SubtractiveBlending)
                 {
                     // TOD: Find blendFuncSeparate() combination
                     GL.Enable(EnableCap.Blend);
                     GL.BlendEquation(BlendEquationMode.FuncAdd);
-                    GL.BlendFunc(BlendingFactorSrc.Zero, BlendingFactorDest.OneMinusSrcColor);
+                    GL.BlendFunc(BlendingFactor.Zero, BlendingFactor.OneMinusSrcColor);
                 }
                 else if (blending == Three.MultiplyBlending)
                 {
                     // TOD: Find blendFuncSeparate() combination
                     GL.Enable(EnableCap.Blend);
                     GL.BlendEquation(BlendEquationMode.FuncAdd);
-                    GL.BlendFunc(BlendingFactorSrc.Zero, BlendingFactorDest.SrcAlpha);
+                    GL.BlendFunc(BlendingFactor.Zero, BlendingFactor.SrcAlpha);
                 }
                 else if (blending == Three.CustomBlending)
                 {
@@ -3846,15 +3901,15 @@
         /// 
         /// </summary>
         /// <param name="depthWrite"></param>
-        private void SetDepthWrite (bool depthWrite ) 
+        private void SetDepthWrite(bool depthWrite)
         {
-		    if ( this._oldDepthWrite != depthWrite )
-		    {
-		        GL.DepthMask(depthWrite);
+            if (this._oldDepthWrite != depthWrite)
+            {
+                GL.DepthMask(depthWrite);
 
-			    this._oldDepthWrite = depthWrite;
-		    }
-	    }
+                this._oldDepthWrite = depthWrite;
+            }
+        }
 
         /// <summary>
         /// 
@@ -3862,11 +3917,12 @@
         /// <param name="width"></param>
         private void SetLineWidth(float width)
         {
-            if ( width != this._oldLineWidth ) {
+            if (width != this._oldLineWidth)
+            {
 
-            GL.LineWidth( width );
+                GL.LineWidth(width);
 
-            this._oldLineWidth = width;
+                this._oldLineWidth = width;
 
             }
         }
@@ -3955,7 +4011,7 @@
             var morphNormalsArrays = geometryGroup.__morphNormalsArrays;
 
             var customAttributes = geometryGroup.__webglCustomAttributesList;
-            //	    var customAttribute;
+            //      var customAttribute;
 
             var faceArray = geometryGroup.__faceArray;
             var lineArray = geometryGroup.__lineArray;
@@ -3982,7 +4038,7 @@
                 obj_uvs2 = geometry.FaceVertexUvs[1];
             }
 
-      	    var obj_colors = geometry.Colors;
+            var obj_colors = geometry.Colors;
 
             var obj_skinIndices = geometry.SkinIndices;
             var obj_skinWeights = geometry.SkinWeights;
@@ -4260,7 +4316,7 @@
 
                     if (vertexNormals.Count == 3 && needsSmoothNormals)
                     {
-                        for (var i = 0; i < 3; i ++)
+                        for (var i = 0; i < 3; i++)
                         {
                             var vn = vertexNormals[i];
 
@@ -4273,7 +4329,7 @@
                     }
                     else
                     {
-                        for (var i = 0; i < 3; i ++)
+                        for (var i = 0; i < 3; i++)
                         {
                             normalArray[offset_normal] = faceNormal.X;
                             normalArray[offset_normal + 1] = faceNormal.Y;
@@ -4301,7 +4357,7 @@
                         continue;
                     }
 
-                    for (var i = 0; i < 3; i ++)
+                    for (var i = 0; i < 3; i++)
                     {
                         var uvi = uv[i];
 
@@ -4332,7 +4388,7 @@
                         continue;
                     }
 
-                    for (var i = 0; i < 3; i ++)
+                    for (var i = 0; i < 3; i++)
                     {
                         var uv2i = uv2[i];
 
@@ -4367,7 +4423,7 @@
 
                     lineArray[offset_line + 2] = (ushort)vertexIndex;
                     lineArray[offset_line + 3] = (ushort)(vertexIndex + 2);
-                                                  
+
                     lineArray[offset_line + 4] = (ushort)(vertexIndex + 1);
                     lineArray[offset_line + 5] = (ushort)(vertexIndex + 2);
 
@@ -4406,7 +4462,7 @@
                     {
                         if (!customAttribute.ContainsKey("boundTo") || (string)customAttribute["boundTo"] == "vertices")
                         {
-                            var array  = (float[])customAttribute["array"];
+                            var array = (float[])customAttribute["array"];
                             var values = (float[])customAttribute["value"];
 
                             for (var f = 0; f < chunk_faces3.Count; f++)
@@ -4507,7 +4563,7 @@
                         if ((string)customAttribute["type"] == "c")
                         {
 
-                            pp = new List<string>()   { "r", "g", "b" };
+                            pp = new List<string>() { "r", "g", "b" };
 
                         }
                         else
@@ -4564,11 +4620,11 @@
                                 //array[offset_custom] = v1[pp[0]];
                                 //array[offset_custom + 1] = v1[pp[1]];
                                 //array[offset_custom + 2] = v1[pp[2]];
-                                
+
                                 //array[offset_custom + 3] = v2[pp[0]];
                                 //array[offset_custom + 4] = v2[pp[1]];
                                 //array[offset_custom + 5] = v2[pp[2]];
-                                
+
                                 //array[offset_custom + 6] = v3[pp[0]];
                                 //array[offset_custom + 7] = v3[pp[1]];
                                 //array[offset_custom + 8] = v3[pp[2]];
@@ -4580,7 +4636,7 @@
                         }
                         else if ((string)customAttribute["boundTo"] == "faceVertices")
                         {
-                            var array  = (float[])customAttribute["array"];
+                            var array = (float[])customAttribute["array"];
                             var values = (List<List<Vector3>>)customAttribute["value"];
 
                             for (var f = 0; f < chunk_faces3.Count; f++)
@@ -4716,7 +4772,7 @@
                     GL.BindBuffer(BufferTarget.ArrayBuffer, (int)((Hashtable)customAttribute["buffer"])["id"]);
                     GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(((float[])customAttribute["array"]).Length * sizeof(float)), (float[])customAttribute["array"], hint);
 
-        //            Debug.WriteLine("BufferData for custumAttributes float[] id {0}", geometryGroup.__webglLineBuffer);
+                    //            Debug.WriteLine("BufferData for custumAttributes float[] id {0}", geometryGroup.__webglLineBuffer);
                 }
             }
 
@@ -4767,7 +4823,7 @@
                 this._oldPolygonOffsetUnits = units;
             }
         }
-        
+
         /// <summary>
         /// 
         /// </summary>
@@ -4775,14 +4831,14 @@
         /// <param name="offset"></param>
         /// <param name="color"></param>
         /// <param name="intensitySq"></param>
-	    private void setColorGamma(List<float> array, int offset, Color color, float intensitySq ) 
+        private void setColorGamma(List<float> array, int offset, Color color, float intensitySq)
         {
             array.Resize(offset + 1 + 2);
 
-            array[offset]     = (color.R / 255.0f * color.R / 255.0f * intensitySq);
+            array[offset] = (color.R / 255.0f * color.R / 255.0f * intensitySq);
             array[offset + 1] = (color.G / 255.0f * color.G / 255.0f * intensitySq);
             array[offset + 2] = (color.B / 255.0f * color.B / 255.0f * intensitySq);
-	    }
+        }
 
         /// <summary>
         /// 
@@ -4798,21 +4854,21 @@
             array[offset] = (color.R / 255.0f * intensity);
             array[offset + 1] = (color.G / 255.0f * intensity);
             array[offset + 2] = (color.B / 255.0f * intensity);
-	    }
+        }
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="color"></param>
         /// <returns></returns>
-        private Color copyGammaToLinear (Color color)
+        private Color copyGammaToLinear(Color color)
         {
             var value = Color.FromArgb(
-		        (int)((color.R / 255.0f * color.R / 255.0f) * 255.0f),
-		        (int)((color.G / 255.0f * color.G / 255.0f) * 255.0f),
-                (int)((color.B / 255.0f * color.B / 255.0f) * 255.0f) );
+                (int)((color.R / 255.0f * color.R / 255.0f) * 255.0f),
+                (int)((color.G / 255.0f * color.G / 255.0f) * 255.0f),
+                (int)((color.B / 255.0f * color.B / 255.0f) * 255.0f));
 
-		    return value;
+            return value;
         }
 
         /// <summary>
@@ -4820,7 +4876,7 @@
         /// </summary>
         /// <param name="uniforms"></param>
         /// <param name="fog"></param>
-        private void RefreshUniformsFog ( Uniforms uniforms, Fog fog ) 
+        private void RefreshUniformsFog(Uniforms uniforms, Fog fog)
         {
 
             uniforms["fogColor"]["value"] = fog.Color;
@@ -4839,14 +4895,14 @@
 
             }
 
-	    }
+        }
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="uniforms"></param>
         /// <param name="material"></param>
-        private void RefreshUniformsPhong ( Uniforms uniforms, MeshPhongMaterial material ) 
+        private void RefreshUniformsPhong(Uniforms uniforms, MeshPhongMaterial material)
         {
             uniforms["shininess"]["value"] = material.Shininess;
 
@@ -4867,14 +4923,14 @@
             {
                 uniforms["wrapRGB"]["value"] = material.WrapRgb;
             }
-	    }
+        }
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="lights"></param>
-        private void SetupLights ( IEnumerable<Light> lights )
-        { 
+        private void SetupLights(IEnumerable<Light> lights)
+        {
             var zlights = this._lights;
 
             var ambiColors = zlights.ambient.colors;
@@ -4898,133 +4954,145 @@
             var hemiPositions = zlights.hemi.positions;
 
             var dirLength = 0;
-		    var pointLength = 0;
-		    var spotLength = 0;
-		    var hemiLength = 0;
+            var pointLength = 0;
+            var spotLength = 0;
+            var hemiLength = 0;
 
             var dirCount = 0;
-		    var pointCount = 0;
-		    var spotCount = 0;
-		    var hemiCount = 0;
+            var pointCount = 0;
+            var spotCount = 0;
+            var hemiCount = 0;
 
-            foreach (var light in lights) 
+            foreach (var light in lights)
             {
                 if (light is ILightShadow && ((ILightShadow)light).onlyShadow)
                 {
                     continue;
                 }
 
-			    var color = light.color;
+                var color = light.color;
 
-			    if ( light is AmbientLight )
-                {                    
+                if (light is AmbientLight)
+                {
                     if (!light.Visible) continue;
 
                     ambiColors.Resize(3);
 
                     float r = 0; float g = 0; float b = 0;
 
-				    if ( this.gammaInput ) {
-					    r += (color.R / 255.0f * color.R / 255.0f);
-					    g += (color.G / 255.0f * color.G / 255.0f);
-					    b += (color.B / 255.0f * color.B / 255.0f);
-				    } else {
+                    if (this.gammaInput)
+                    {
+                        r += (color.R / 255.0f * color.R / 255.0f);
+                        g += (color.G / 255.0f * color.G / 255.0f);
+                        b += (color.B / 255.0f * color.B / 255.0f);
+                    }
+                    else
+                    {
                         r += (color.R / 255.0f);
                         g += (color.G / 255.0f);
-					    b += (color.B / 255.0f);
-				    }
+                        b += (color.B / 255.0f);
+                    }
 
                     ambiColors[0] = r;
                     ambiColors[1] = g;
                     ambiColors[2] = b;
 
-			    } 
-                else if ( light is DirectionalLight )
+                }
+                else if (light is DirectionalLight)
                 {
                     var directionalLight = light as DirectionalLight;
 
-				    dirCount += 1;
+                    dirCount += 1;
 
-				    if ( ! light.Visible ) continue;
+                    if (!light.Visible) continue;
 
                     this._direction = new Vector3().SetFromMatrixPosition(directionalLight.MatrixWorld);
                     var vector3 = new Vector3().SetFromMatrixPosition(directionalLight.target.MatrixWorld);
-				    this._direction-= vector3;
-				    this._direction.Normalize();
+                    this._direction -= vector3;
+                    this._direction.Normalize();
 
-				    var dirOffset = dirLength * 3;
+                    var dirOffset = dirLength * 3;
 
                     dirPositions.Resize(dirOffset + 1 + 2);
 
-				    dirPositions[ dirOffset ]     = this._direction.X;
-				    dirPositions[ dirOffset + 1 ] = this._direction.Y;
-				    dirPositions[ dirOffset + 2 ] = this._direction.Z;
+                    dirPositions[dirOffset] = this._direction.X;
+                    dirPositions[dirOffset + 1] = this._direction.Y;
+                    dirPositions[dirOffset + 2] = this._direction.Z;
 
-				    if ( this.gammaInput ) {
+                    if (this.gammaInput)
+                    {
                         this.setColorGamma(dirColors, dirOffset, color, directionalLight.intensity * directionalLight.intensity);
-				    } else {
+                    }
+                    else
+                    {
                         this.setColorLinear(dirColors, dirOffset, color, directionalLight.intensity);
-				    }
+                    }
 
-				    dirLength += 1;
+                    dirLength += 1;
 
-			    }
-                else if ( light is PointLight )
+                }
+                else if (light is PointLight)
                 {
 
                     var pointLight = light as PointLight;
-              
+
                     pointCount += 1;
 
                     if (!light.Visible) continue;
 
-				    var pointOffset = pointLength * 3;
+                    var pointOffset = pointLength * 3;
 
-				    if ( this.gammaInput ) {
+                    if (this.gammaInput)
+                    {
 
                         this.setColorGamma(pointColors, pointOffset, color, pointLight.intensity * pointLight.intensity);
 
-				    } else {
+                    }
+                    else
+                    {
 
                         this.setColorLinear(pointColors, pointOffset, color, pointLight.intensity);
 
-				    }
+                    }
 
-				    var vector3 = new Vector3().SetFromMatrixPosition( light.MatrixWorld );
+                    var vector3 = new Vector3().SetFromMatrixPosition(light.MatrixWorld);
 
                     pointPositions.Resize(pointOffset + 1 + 2);
-                    
+
                     pointPositions[pointOffset] = vector3.X;
-				    pointPositions[ pointOffset + 1 ] = vector3.Y;
-				    pointPositions[ pointOffset + 2 ] = vector3.Z;
+                    pointPositions[pointOffset + 1] = vector3.Y;
+                    pointPositions[pointOffset + 2] = vector3.Z;
 
                     pointDistances.Resize(pointLength + 1);
                     pointDistances[pointLength] = pointLight.distance;
 
-				    pointLength += 1;
+                    pointLength += 1;
 
-			    } 
-                else if ( light is SpotLight ) 
+                }
+                else if (light is SpotLight)
                 {
                     var spotLight = light as SpotLight;
-                    
-				    spotCount += 1;
+
+                    spotCount += 1;
 
                     if (!light.Visible) continue;
 
-				    var spotOffset = spotLength * 3;
+                    var spotOffset = spotLength * 3;
 
-				    if ( this.gammaInput ) {
+                    if (this.gammaInput)
+                    {
 
                         this.setColorGamma(spotColors, spotOffset, color, spotLight.intensity * spotLight.intensity);
 
-				    } else {
+                    }
+                    else
+                    {
 
                         this.setColorLinear(spotColors, spotOffset, color, spotLight.intensity);
 
-				    }
+                    }
 
-				    var vector3 = new Vector3().SetFromMatrixPosition( light.MatrixWorld );
+                    var vector3 = new Vector3().SetFromMatrixPosition(light.MatrixWorld);
 
                     spotPositions.Resize(spotOffset + 1 + 2);
                     spotPositions[spotOffset] = vector3.X;
@@ -5034,87 +5102,90 @@
                     spotDistances.Resize(spotLength + 1);
                     spotDistances[spotLength] = spotLight.distance;
 
-				    this._direction = vector3;
+                    this._direction = vector3;
 
                     vector3 = new Vector3().SetFromMatrixPosition(spotLight.target.MatrixWorld);
-				    this._direction-=vector3;
-				    this._direction.Normalize();
+                    this._direction -= vector3;
+                    this._direction.Normalize();
 
                     spotDirections.Resize(spotOffset + 1 + 2);
                     spotDirections[spotOffset] = this._direction.X;
-				    spotDirections[ spotOffset + 1 ] = this._direction.Y;
-				    spotDirections[ spotOffset + 2 ] = this._direction.Z;
+                    spotDirections[spotOffset + 1] = this._direction.Y;
+                    spotDirections[spotOffset + 2] = this._direction.Z;
 
-                    spotAnglesCos.Resize(spotLength + 1); 
+                    spotAnglesCos.Resize(spotLength + 1);
                     spotAnglesCos[spotLength] = (float)Math.Cos(spotLight.angle);
 
                     spotExponents.Resize(spotLength + 1);
                     spotExponents[spotLength] = spotLight.exponent;
 
-				    spotLength += 1;
+                    spotLength += 1;
 
-			    } 
-                else if ( light is HemisphereLight )
+                }
+                else if (light is HemisphereLight)
                 {
                     var hemisphereLight = light as HemisphereLight;
-                    
-				    hemiCount += 1;
+
+                    hemiCount += 1;
 
                     if (!light.Visible) continue;
 
                     this._direction = new Vector3().SetFromMatrixPosition(light.MatrixWorld).Normalize();
 
-				    var hemiOffset = hemiLength * 3;
+                    var hemiOffset = hemiLength * 3;
 
                     hemiPositions.Resize(hemiOffset + 1 + 2);
                     hemiPositions[hemiOffset] = this._direction.X;
-				    hemiPositions[ hemiOffset + 1 ] = this._direction.Y;
-				    hemiPositions[ hemiOffset + 2 ] = this._direction.Z;
+                    hemiPositions[hemiOffset + 1] = this._direction.Y;
+                    hemiPositions[hemiOffset + 2] = this._direction.Z;
 
-				    var skyColor = light.color;
+                    var skyColor = light.color;
                     var groundColor = hemisphereLight.groundColor;
 
-				    if ( this.gammaInput ) {
+                    if (this.gammaInput)
+                    {
 
                         var intensitySq = hemisphereLight.intensity * hemisphereLight.intensity;
 
-					    this.setColorGamma( hemiSkyColors, hemiOffset, skyColor, intensitySq );
-					    this.setColorGamma( hemiGroundColors, hemiOffset, groundColor, intensitySq );
+                        this.setColorGamma(hemiSkyColors, hemiOffset, skyColor, intensitySq);
+                        this.setColorGamma(hemiGroundColors, hemiOffset, groundColor, intensitySq);
 
-				    } else {
+                    }
+                    else
+                    {
 
                         this.setColorLinear(hemiSkyColors, hemiOffset, skyColor, hemisphereLight.intensity);
                         this.setColorLinear(hemiGroundColors, hemiOffset, groundColor, hemisphereLight.intensity);
 
-				    }
+                    }
 
-				    hemiLength += 1;
+                    hemiLength += 1;
 
-			    }
+                }
 
-		    }
+            }
 
-		    // null eventual remains from removed Lights
-		    // (this is to avoid if in shader)
+            // null eventual remains from removed Lights
+            // (this is to avoid if in shader)
 
-		    for (var l = dirLength * 3;   l < Math.Max( dirColors.Count, dirCount * 3 );       l++) dirColors[ l ] = 0.0f;
-            for (var l = pointLength * 3; l < Math.Max(pointColors.Count, pointCount * 3);     l++) pointColors[l] = 0.0f;
-            for (var l = spotLength * 3;  l < Math.Max(spotColors.Count, spotCount * 3);       l++) spotColors[l] = 0.0f;
-            for (var l = hemiLength * 3;  l < Math.Max(hemiSkyColors.Count, hemiCount * 3);    l++) hemiSkyColors[l] = 0.0f;
-            for (var l = hemiLength * 3;  l < Math.Max(hemiGroundColors.Count, hemiCount * 3); l++) hemiGroundColors[l] = 0.0f;
+            for (var l = dirLength * 3; l < Math.Max(dirColors.Count, dirCount * 3); l++) dirColors[l] = 0.0f;
+            for (var l = pointLength * 3; l < Math.Max(pointColors.Count, pointCount * 3); l++) pointColors[l] = 0.0f;
+            for (var l = spotLength * 3; l < Math.Max(spotColors.Count, spotCount * 3); l++) spotColors[l] = 0.0f;
+            for (var l = hemiLength * 3; l < Math.Max(hemiSkyColors.Count, hemiCount * 3); l++) hemiSkyColors[l] = 0.0f;
+            for (var l = hemiLength * 3; l < Math.Max(hemiGroundColors.Count, hemiCount * 3); l++) hemiGroundColors[l] = 0.0f;
 
             zlights.directional.length = dirLength;
             zlights.point.length = pointLength;
             zlights.spot.length = spotLength;
             zlights.hemi.length = hemiLength;
-	    }
+        }
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="uniforms"></param>
         /// <param name="material"></param>
-        private void RefreshUniformsLine (Uniforms uniforms, Material material)
+        private void RefreshUniformsLine(Uniforms uniforms, Material material)
         {
             var lineBasicMaterial = material as LineBasicMaterial;
             if (null != lineBasicMaterial)
@@ -5163,7 +5234,7 @@
         /// </summary>
         /// <param name="uniforms"></param>
         /// <param name="material"></param>
-        private void RefreshUniformsParticle (Uniforms uniforms, Material material)
+        private void RefreshUniformsParticle(Uniforms uniforms, Material material)
         {
             if (material is PointCloudMaterial)
             {
@@ -5204,25 +5275,25 @@
             {
                 uniforms["wrapRGB"]["value"] = material.WrapRgb;
             }
-	    }
+        }
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="uniforms"></param>
         /// <param name="lights"></param>
-        private void refreshUniformsShadow ( Uniforms uniforms, IEnumerable<Light> lights )
+        private void refreshUniformsShadow(Uniforms uniforms, IEnumerable<Light> lights)
         {
-            if ( uniforms["shadowMatrix"] != null) 
+            if (uniforms["shadowMatrix"] != null)
             {
-                foreach ( var light in lights )
+                foreach (var light in lights)
                 {
                     if (light is ILightShadow)
                     {
                         var lightShadow = light as ILightShadow;
 
                         if (!light.CastShadow) continue;
-                //        if (lightShadow.shadowCascade) continue;
+                        //        if (lightShadow.shadowCascade) continue;
 
                         if (light is SpotLight || (light is DirectionalLight/* && !lightShadow.shadowCascade*/))
                         {
@@ -5237,7 +5308,7 @@
                     }
                 }
             }
-	    }
+        }
 
         /// <summary>
         /// 
@@ -5367,7 +5438,7 @@
                 if (this._logarithmicDepthBuffer)
                 {
                     throw new NotImplementedException();
-                 //   GL.Uniform1(p_uniforms["logDepthBufFC"], 2.0 / (Math.Log(camera.far + 1.0) / Math.LN2));
+                    //   GL.Uniform1(p_uniforms["logDepthBufFC"], 2.0 / (Math.Log(camera.far + 1.0) / Math.LN2));
 
                 }
 
@@ -5379,9 +5450,9 @@
                 // load material specific uniformsLocation
                 // (shader material also gets them for the sake of genericity)
 
-			    if ( material is ShaderMaterial ||
-				     material is MeshPhongMaterial ||
-				     (material.EnvMap != null) ) 
+                if (material is ShaderMaterial ||
+                     material is MeshPhongMaterial ||
+                     (material.EnvMap != null))
                 {
                     uniformLocation = uniformsLocation["cameraPosition"];
                     if (uniformLocation != null)
@@ -5392,13 +5463,13 @@
                 }
 
 
-                if (material is MeshPhongMaterial 
+                if (material is MeshPhongMaterial
                 || material is MeshLambertMaterial
                 || //               material.skinning ||
                     material is ShaderMaterial)
                 {
                     uniformLocation = uniformsLocation["viewMatrix"];
-                    if (uniformLocation  != null)
+                    if (uniformLocation != null)
                     {
                         GL.UniformMatrix4((int)uniformLocation, 1, false, camera.MatrixWorldInverse.Elements);
                     }
@@ -5468,22 +5539,26 @@
                 }
 
                 if (material is MeshPhongMaterial ||
-                     material is MeshLambertMaterial 
+                     material is MeshLambertMaterial
            /*          material.lights*/) // TODO
                 {
-                        if ( this._lightsNeedUpdate ) {
+                    if (this._lightsNeedUpdate)
+                    {
 
-                            refreshLights = true;
-                            this.SetupLights( lights );
-                            this._lightsNeedUpdate = false;
-                        }
+                        refreshLights = true;
+                        this.SetupLights(lights);
+                        this._lightsNeedUpdate = false;
+                    }
 
-                        if ( refreshLights ) {
-                            this.RefreshUniformsLights( m_uniforms, this._lights );
-                            this.markUniformsLightsNeedsUpdate( m_uniforms, true );
-                        } else {
-                            this.markUniformsLightsNeedsUpdate( m_uniforms, false );
-                        }
+                    if (refreshLights)
+                    {
+                        this.RefreshUniformsLights(m_uniforms, this._lights);
+                        this.markUniformsLightsNeedsUpdate(m_uniforms, true);
+                    }
+                    else
+                    {
+                        this.markUniformsLightsNeedsUpdate(m_uniforms, false);
+                    }
                 }
 
                 if (material is MeshBasicMaterial || material is MeshLambertMaterial || material is MeshPhongMaterial)
@@ -5495,16 +5570,16 @@
 
                 if (material is LineBasicMaterial)
                 {
-                    this.RefreshUniformsLine( m_uniforms, material );
+                    this.RefreshUniformsLine(m_uniforms, material);
                 }
                 else if (material is LineDashedMaterial)
                 {
-                    this.RefreshUniformsLine( m_uniforms, material );
-                    this.RefreshUniformsDash( m_uniforms, material );
+                    this.RefreshUniformsLine(m_uniforms, material);
+                    this.RefreshUniformsDash(m_uniforms, material);
                 }
                 else if (material is PointCloudMaterial)
                 {
-                    this.RefreshUniformsParticle( m_uniforms, material );
+                    this.RefreshUniformsParticle(m_uniforms, material);
                 }
                 else if (material is MeshPhongMaterial)
                 {
@@ -5525,8 +5600,9 @@
                     m_uniforms["opacity"]["value"] = material.Opacity;
                 }
 
-                if ( object3D.ReceiveShadow/* && ! material._shadowPass*/ ) {
-                    this.refreshUniformsShadow( m_uniforms, lights );
+                if (object3D.ReceiveShadow/* && ! material._shadowPass*/ )
+                {
+                    this.refreshUniformsShadow(m_uniforms, lights);
                 }
 
                 // load common uniformsLocation
@@ -5620,7 +5696,7 @@
                     var mipmap = mipmaps[level];
                     if (texture.Format != Three.RGBAFormat)
                     {
-                        GL.CompressedTexImage2D(TextureTarget.Texture2D, level, glInternalFormat, mipmap.Width, mipmap.Height, 0, mipmap.Data.Length, mipmap.Data);
+                        GL.CompressedTexImage2D(TextureTarget.Texture2D, level, (InternalFormat)glInternalFormat, mipmap.Width, mipmap.Height, 0, mipmap.Data.Length, mipmap.Data);
                     }
                     else
                     {
@@ -5673,7 +5749,7 @@
         /// <param name="slot"></param>
         private void SetCubeTexture(Texture texture, int slot)
         {
-            
+
         }
 
         /// <summary>
@@ -5694,7 +5770,7 @@
         private void SetTexture(ITexture texture, int slot)
         {
             GL.ActiveTexture(TextureUnit.Texture0 + slot);
-            
+
             if (texture.NeedsUpdate)
             {
                 this.UploadTexture((Texture)texture);
@@ -5713,12 +5789,13 @@
         /// <returns></returns>
         private Bitmap clampToMaxSize(Bitmap image, int maxSize)
         {
-		    if ( image.Width > maxSize || image.Height > maxSize ) {
+            if (image.Width > maxSize || image.Height > maxSize)
+            {
 
-			    // Warning: Scaling through the canvas will only work with images that use
-			    // premultiplied alpha.
+                // Warning: Scaling through the canvas will only work with images that use
+                // premultiplied alpha.
 
-			    var scale = maxSize / Math.Max( image.Width, image.Height );
+                var scale = maxSize / Math.Max(image.Width, image.Height);
 
                 //var canvas = document.createElement( 'canvas' );
                 //canvas.width = Math.floor( image.width * scale );
@@ -5731,10 +5808,10 @@
 
                 return image;
 
-		    }
+            }
 
-		    return image;
-	    }
+            return image;
+        }
 
         /// <summary>
         /// 
@@ -5761,9 +5838,9 @@
                 GL.TexParameter(textureTarget, TextureParameterName.TextureMinFilter, this.filterFallback(texture.MinFilter));
             }
 
-            if ( this.glExtensionTextureFilterAnisotropic && (texture.Type != Three.FloatType) ) 
+            if (this.glExtensionTextureFilterAnisotropic && (texture.Type != Three.FloatType))
             {
-                if ( texture.Anisotropy > 1)// || texture.__oldAnisotropy < 0 ) // TODO
+                if (texture.Anisotropy > 1)// || texture.__oldAnisotropy < 0 ) // TODO
                 {
                     GL.TexParameter(textureTarget, (TextureParameterName)ExtTextureFilterAnisotropic.TextureMaxAnisotropyExt, Math.Min(texture.Anisotropy, this.MaxAnisotropy));
                     //             texture.__oldAnisotropy = texture.Anisotropy;// TODO
@@ -5795,18 +5872,18 @@
         /// 
         /// </summary>
         /// <param name="object3D"></param>
-		private void UpdateSkeletons( Object3D object3D )
+        private void UpdateSkeletons(Object3D object3D)
         {
             if (object3D is SkinnedMesh)
             {
                 //object3D.skeleton.update();
-			}
+            }
 
             foreach (var child in object3D.Children)
             {
                 this.UpdateSkeletons(child);
-			}
-		}
+            }
+        }
 
         /// <summary>
         /// 
@@ -5825,7 +5902,7 @@
                 throw new NotImplementedException();
 
                 var buffer = webglObject.buffer as GeometryGroup;
-  
+
                 var materialIndex = geometry is BufferGeometry ? 0 : buffer.MaterialIndex;
 
                 //    material = material.materials[ materialIndex ];
@@ -5869,50 +5946,51 @@
         /// <param name="object3D"></param>
         private void SetParticleBuffers(Geometry geometry, BufferUsageHint hint, PointCloud object3D)
         {
-		    var vertices = geometry.Vertices;
-		    var vl = vertices.Count;
-            
-            var colors = geometry.Colors;
-		    var cl = colors.Count;
-            
-            var vertexArray = geometry.__vertexArray;
-		    var colorArray = geometry.__colorArray;
-            
-            var sortArray = geometry.__sortArray;
-            
-            var dirtyVertices = geometry.VerticesNeedUpdate;
-		    var dirtyElements = geometry.ElementsNeedUpdate;
-		    var dirtyColors = geometry.ColorsNeedUpdate;
+            var vertices = geometry.Vertices;
+            var vl = vertices.Count;
 
-		    var customAttributes = geometry.__webglCustomAttributesList;
+            var colors = geometry.Colors;
+            var cl = colors.Count;
+
+            var vertexArray = geometry.__vertexArray;
+            var colorArray = geometry.__colorArray;
+
+            var sortArray = geometry.__sortArray;
+
+            var dirtyVertices = geometry.VerticesNeedUpdate;
+            var dirtyElements = geometry.ElementsNeedUpdate;
+            var dirtyColors = geometry.ColorsNeedUpdate;
+
+            var customAttributes = geometry.__webglCustomAttributesList;
 
             var offset = 0;
-            
-            if ( object3D.sortParticles ) {
+
+            if (object3D.sortParticles)
+            {
 
                 throw new NotImplementedException();
 
-                this._projScreenMatrixPS.Copy( this._projScreenMatrix );
-                this._projScreenMatrixPS.Multiply( object3D.MatrixWorld );
+                this._projScreenMatrixPS.Copy(this._projScreenMatrix);
+                this._projScreenMatrixPS.Multiply(object3D.MatrixWorld);
 
-                for (int v = 0; v < vl; v ++ ) 
+                for (int v = 0; v < vl; v++)
                 {
 
-                    var vertex = vertices[ v ];
+                    var vertex = vertices[v];
 
                     var _vector3 = new Vector3();
                     _vector3.Copy(vertex);
                     _vector3.ApplyProjection(this._projScreenMatrixPS);
 
-     //               sortArray[ v ] = [ _vector3.Z, v ];
+                    //               sortArray[ v ] = [ _vector3.Z, v ];
                 }
 
-   //             sortArray.sort(numericalSort);
+                //             sortArray.sort(numericalSort);
 
-                for (int v = 0; v < vl; v ++ )
+                for (int v = 0; v < vl; v++)
                 {
 
-    //                var vertex = vertices[sortArray[v][1]];
+                    //                var vertex = vertices[sortArray[v][1]];
 
                     offset = v * 3;
 
@@ -5922,11 +6000,12 @@
 
                 }
 
-                for (int c = 0; c < cl; c ++ ) {
+                for (int c = 0; c < cl; c++)
+                {
 
                     offset = c * 3;
 
-    //                var color = colors[sortArray[c][1]];
+                    //                var color = colors[sortArray[c][1]];
 
                     //colorArray[ offset ]     = color.R;
                     //colorArray[ offset + 1 ] = color.G;
@@ -5934,107 +6013,110 @@
 
                 }
 
-                if (null != customAttributes ) {
-/*
-                    for (int i = 0, il = customAttributes.Count; i < il; i ++ ) {
+                if (null != customAttributes)
+                {
+                    /*
+                                        for (int i = 0, il = customAttributes.Count; i < il; i ++ ) {
 
-                        var customAttribute = customAttributes[ i ];
+                                            var customAttribute = customAttributes[ i ];
 
-                        if ( ! ( customAttribute.boundTo == null || customAttribute.boundTo == "vertices" ) ) continue;
+                                            if ( ! ( customAttribute.boundTo == null || customAttribute.boundTo == "vertices" ) ) continue;
 
-                        offset = 0;
+                                            offset = 0;
 
-                        var cal = customAttribute.value.length;
+                                            var cal = customAttribute.value.length;
 
-                        if ( customAttribute.size == 1 ) {
+                                            if ( customAttribute.size == 1 ) {
 
-                            for (int ca = 0; ca < cal; ca ++ ) {
+                                                for (int ca = 0; ca < cal; ca ++ ) {
 
-                                var index = sortArray[ ca ][ 1 ];
+                                                    var index = sortArray[ ca ][ 1 ];
 
-                                customAttribute.array[ ca ] = customAttribute.value[ index ];
+                                                    customAttribute.array[ ca ] = customAttribute.value[ index ];
 
-                            }
+                                                }
 
-                        } else if ( customAttribute.size == 2 ) {
+                                            } else if ( customAttribute.size == 2 ) {
 
-                            for (int ca = 0; ca < cal; ca ++ ) {
+                                                for (int ca = 0; ca < cal; ca ++ ) {
 
-                                var index = sortArray[ ca ][ 1 ];
+                                                    var index = sortArray[ ca ][ 1 ];
 
-                                var value = customAttribute.value[ index ];
+                                                    var value = customAttribute.value[ index ];
 
-                                customAttribute.array[ offset ]   = value.X;
-                                customAttribute.array[ offset + 1 ] = value.Y;
+                                                    customAttribute.array[ offset ]   = value.X;
+                                                    customAttribute.array[ offset + 1 ] = value.Y;
 
-                                offset += 2;
+                                                    offset += 2;
 
-                            }
+                                                }
 
-                        } else if ( customAttribute.size == 3 ) {
+                                            } else if ( customAttribute.size == 3 ) {
 
-                            if ( customAttribute.type == "c" ) {
+                                                if ( customAttribute.type == "c" ) {
 
-                                for (int ca = 0; ca < cal; ca ++ ) {
+                                                    for (int ca = 0; ca < cal; ca ++ ) {
 
-                                    var index = sortArray[ ca ][ 1 ];
+                                                        var index = sortArray[ ca ][ 1 ];
 
-                                    var value = customAttribute.value[ index ];
+                                                        var value = customAttribute.value[ index ];
 
-                                    customAttribute.array[ offset ]     = value.R;
-                                    customAttribute.array[ offset + 1 ] = value.G;
-                                    customAttribute.array[ offset + 2 ] = value.B;
+                                                        customAttribute.array[ offset ]     = value.R;
+                                                        customAttribute.array[ offset + 1 ] = value.G;
+                                                        customAttribute.array[ offset + 2 ] = value.B;
 
-                                    offset += 3;
+                                                        offset += 3;
 
-                                }
+                                                    }
 
-                            } else {
+                                                } else {
 
-                                for (int ca = 0; ca < cal; ca ++ ) {
+                                                    for (int ca = 0; ca < cal; ca ++ ) {
 
-                                    var index = sortArray[ ca ][ 1 ];
+                                                        var index = sortArray[ ca ][ 1 ];
 
-                                    var value = customAttribute.value[ index ];
+                                                        var value = customAttribute.value[ index ];
 
-                                    customAttribute.array[ offset ]   = value.X;
-                                    customAttribute.array[ offset + 1 ] = value.Y;
-                                    customAttribute.array[ offset + 2 ] = value.Z;
+                                                        customAttribute.array[ offset ]   = value.X;
+                                                        customAttribute.array[ offset + 1 ] = value.Y;
+                                                        customAttribute.array[ offset + 2 ] = value.Z;
 
-                                    offset += 3;
+                                                        offset += 3;
 
-                                }
+                                                    }
 
-                            }
+                                                }
 
-                        } else if ( customAttribute.size == 4 ) {
+                                            } else if ( customAttribute.size == 4 ) {
 
-                            for (int ca = 0; ca < cal; ca ++ ) {
+                                                for (int ca = 0; ca < cal; ca ++ ) {
 
-                                var index = sortArray[ ca ][ 1 ];
+                                                    var index = sortArray[ ca ][ 1 ];
 
-                                var value = customAttribute.value[ index ];
+                                                    var value = customAttribute.value[ index ];
 
-                                customAttribute.array[ offset ]      = value.X;
-                                customAttribute.array[ offset + 1  ] = value.Y;
-                                customAttribute.array[ offset + 2  ] = value.Z;
-                                customAttribute.array[ offset + 3  ] = value.w;
+                                                    customAttribute.array[ offset ]      = value.X;
+                                                    customAttribute.array[ offset + 1  ] = value.Y;
+                                                    customAttribute.array[ offset + 2  ] = value.Z;
+                                                    customAttribute.array[ offset + 3  ] = value.w;
 
-                                offset += 4;
+                                                    offset += 4;
 
-                            }
+                                                }
 
-                        }
+                                            }
 
-                    }
-*/
+                                        }
+                    */
                 }
 
-            } else {
+            }
+            else
+            {
 
-                if ( dirtyVertices )
+                if (dirtyVertices)
                 {
-                    for (int v = 0; v < vl; v ++ ) 
+                    for (int v = 0; v < vl; v++)
                     {
                         var vertex = vertices[v];
 
@@ -6047,47 +6129,51 @@
 
                 }
 
-                if ( dirtyColors )
+                if (dirtyColors)
                 {
-                    for (int c = 0; c < cl; c ++ ) 
+                    for (int c = 0; c < cl; c++)
                     {
-                        var color = colors[ c ];
+                        var color = colors[c];
 
                         offset = c * 3;
 
-                        colorArray[ offset ]     = color.R;
-                        colorArray[ offset + 1 ] = color.G;
-                        colorArray[ offset + 2 ] = color.B;
+                        colorArray[offset] = color.R;
+                        colorArray[offset + 1] = color.G;
+                        colorArray[offset + 2] = color.B;
                     }
 
                 }
 
-                if (null != customAttributes ) {
+                if (null != customAttributes)
+                {
 
-                    for (int i = 0, il = customAttributes.Count; i < il; i ++ )
+                    for (int i = 0, il = customAttributes.Count; i < il; i++)
                     {
                         var customAttribute = customAttributes[i];
 
-                        if ( (bool)customAttribute["needsUpdate"]
+                        if ((bool)customAttribute["needsUpdate"]
                         && (!customAttribute.ContainsKey("boundTo") || (string)customAttribute["boundTo"] == "vertices"))
                         {
                             var cal = ((float[])customAttribute["array"]).Length / (int)customAttribute["size"];
 
-                            var array  = (float[])customAttribute["array"];
+                            var array = (float[])customAttribute["array"];
                             var values = customAttribute["value"];
 
                             offset = 0;
 
-                            if ( (int)customAttribute["size"] == 1 )
+                            if ((int)customAttribute["size"] == 1)
                             {
-                                for (int ca = 0; ca < cal; ca ++ )
+                                for (int ca = 0; ca < cal; ca++)
                                 {
                                     array[ca] = ((float[])values)[ca];
                                 }
 
-                            } else if ( (int)customAttribute["size"] == 2 ) {
+                            }
+                            else if ((int)customAttribute["size"] == 2)
+                            {
 
-                                for (int ca = 0; ca < cal; ca ++ ) {
+                                for (int ca = 0; ca < cal; ca++)
+                                {
 
                                     var value = ((Vector2[])values)[ca];
 
@@ -6097,11 +6183,15 @@
                                     offset += 2;
                                 }
 
-                            } else if ( (int)customAttribute["size"] == 3 ) {
+                            }
+                            else if ((int)customAttribute["size"] == 3)
+                            {
 
-                                if ( (string)customAttribute["type"] == "c" ) {
+                                if ((string)customAttribute["type"] == "c")
+                                {
 
-                                    for (int ca = 0; ca < cal; ca ++ ) {
+                                    for (int ca = 0; ca < cal; ca++)
+                                    {
 
                                         var value = ((Color[])values)[ca];
 
@@ -6112,9 +6202,12 @@
                                         offset += 3;
                                     }
 
-                                } else {
+                                }
+                                else
+                                {
 
-                                    for (int ca = 0; ca < cal; ca ++ ) {
+                                    for (int ca = 0; ca < cal; ca++)
+                                    {
 
                                         var value = ((Vector3[])values)[ca];
 
@@ -6129,7 +6222,8 @@
                             else if ((int)customAttribute["size"] == 4)
                             {
 
-                                for (int ca = 0; ca < cal; ca ++ ) {
+                                for (int ca = 0; ca < cal; ca++)
+                                {
 
                                     var value = ((Vector4[])values)[ca];
 
@@ -6147,25 +6241,26 @@
 
             }
 
-            if ( dirtyVertices || object3D.sortParticles ) 
+            if (dirtyVertices || object3D.sortParticles)
             {
-                GL.BindBuffer( BufferTarget.ArrayBuffer, geometry.__webglVertexBuffer );
-                GL.BufferData( BufferTarget.ArrayBuffer, (IntPtr)(vertexArray.Length), vertexArray, hint );
+                GL.BindBuffer(BufferTarget.ArrayBuffer, geometry.__webglVertexBuffer);
+                GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(vertexArray.Length), vertexArray, hint);
             }
 
-            if ( dirtyColors || object3D.sortParticles )
+            if (dirtyColors || object3D.sortParticles)
             {
-                GL.BindBuffer( BufferTarget.ArrayBuffer, geometry.__webglColorBuffer );
-                GL.BufferData( BufferTarget.ArrayBuffer, (IntPtr)(colorArray.Length), colorArray, hint );
+                GL.BindBuffer(BufferTarget.ArrayBuffer, geometry.__webglColorBuffer);
+                GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(colorArray.Length), colorArray, hint);
             }
 
-            if (null != customAttributes ) {
+            if (null != customAttributes)
+            {
 
-                for (int i = 0, il = customAttributes.Count; i < il; i ++ )
+                for (int i = 0, il = customAttributes.Count; i < il; i++)
                 {
                     var customAttribute = customAttributes[i];
 
-                    if ( (bool)customAttribute["needsUpdate"] || object3D.sortParticles ) 
+                    if ((bool)customAttribute["needsUpdate"] || object3D.sortParticles)
                     {
                         GL.BindBuffer(BufferTarget.ArrayBuffer, (int)((Hashtable)customAttribute["buffer"])["id"]);
                         GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(((float[])customAttribute["array"]).Length * sizeof(float)), (float[])customAttribute["array"], hint);
@@ -6179,7 +6274,7 @@
         /// </summary>
         /// <param name="geometry"></param>
         /// <param name="hint"></param>
-        private void setLineBuffers (Geometry geometry, BufferUsageHint hint )
+        private void setLineBuffers(Geometry geometry, BufferUsageHint hint)
         {
             var vertices = geometry.Vertices;
             var colors = geometry.Colors;
@@ -6201,148 +6296,155 @@
 
             var offset = 0;
 
-		    if ( dirtyVertices ) {
+            if (dirtyVertices)
+            {
 
-			    for (int v = 0; v < vl; v ++ ) {
+                for (int v = 0; v < vl; v++)
+                {
 
-				    var vertex = vertices[ v ];
+                    var vertex = vertices[v];
 
-				    offset = v * 3;
+                    offset = v * 3;
 
-				    vertexArray[ offset ]     = vertex.X;
-				    vertexArray[ offset + 1 ] = vertex.Y;
-				    vertexArray[ offset + 2 ] = vertex.Z;
+                    vertexArray[offset] = vertex.X;
+                    vertexArray[offset + 1] = vertex.Y;
+                    vertexArray[offset + 2] = vertex.Z;
 
-			    }
+                }
 
                 GL.BindBuffer(BufferTarget.ArrayBuffer, geometry.__webglVertexBuffer);
                 GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(vertexArray.Length * sizeof(float)), vertexArray, hint);
-		    }
+            }
 
-		    if ( dirtyColors ) {
+            if (dirtyColors)
+            {
 
-			    for (int c = 0; c < cl; c ++ ) {
+                for (int c = 0; c < cl; c++)
+                {
 
-				    var color = colors[ c ];
+                    var color = colors[c];
 
-				    offset = c * 3;
+                    offset = c * 3;
 
-				    colorArray[ offset ]     = color.R;
-				    colorArray[ offset + 1 ] = color.G;
-				    colorArray[ offset + 2 ] = color.B;
-			    }
+                    colorArray[offset] = color.R;
+                    colorArray[offset + 1] = color.G;
+                    colorArray[offset + 2] = color.B;
+                }
 
                 GL.BindBuffer(BufferTarget.ArrayBuffer, geometry.__webglColorBuffer);
                 GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(colorArray.Length * sizeof(float)), colorArray, hint); // float ??
-		    }
+            }
 
-		    if ( dirtyLineDistances ) {
+            if (dirtyLineDistances)
+            {
 
-			    for (int d = 0; d < dl; d ++ ) {
+                for (int d = 0; d < dl; d++)
+                {
 
-				    lineDistanceArray[ d ] = lineDistances[ d ];
+                    lineDistanceArray[d] = lineDistances[d];
 
-			    }
+                }
 
                 GL.BindBuffer(BufferTarget.ArrayBuffer, geometry.__webglLineDistanceBuffer);
                 GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(lineDistanceArray.Length * sizeof(float)), lineDistanceArray, hint); // float ??
 
-		    }
+            }
 
-		    if (null != customAttributes ) {
+            if (null != customAttributes)
+            {
 
-			    for (int i = 0, il = customAttributes.Count; i < il; i ++ )
+                for (int i = 0, il = customAttributes.Count; i < il; i++)
                 {
-				    var customAttribute = customAttributes[ i ];
-/*
-				    if ( customAttribute.needsUpdate &&
-					     ( customAttribute.boundTo == null ||
-						     customAttribute.boundTo == "vertices" ) ) {
+                    var customAttribute = customAttributes[i];
+                    /*
+                                        if ( customAttribute.needsUpdate &&
+                                             ( customAttribute.boundTo == null ||
+                                                 customAttribute.boundTo == "vertices" ) ) {
 
-					    offset = 0;
+                                            offset = 0;
 
-					    var cal = customAttribute.value.length;
+                                            var cal = customAttribute.value.length;
 
-					    if ( customAttribute.size == 1 ) {
+                                            if ( customAttribute.size == 1 ) {
 
-						    for (int ca = 0; ca < cal; ca ++ ) {
+                                                for (int ca = 0; ca < cal; ca ++ ) {
 
-							    customAttribute.array[ ca ] = customAttribute.value[ ca ];
+                                                    customAttribute.array[ ca ] = customAttribute.value[ ca ];
 
-						    }
+                                                }
 
-					    } else if ( customAttribute.size == 2 ) {
+                                            } else if ( customAttribute.size == 2 ) {
 
-						    for (int ca = 0; ca < cal; ca ++ ) {
+                                                for (int ca = 0; ca < cal; ca ++ ) {
 
-							    var value = customAttribute.value[ ca ];
+                                                    var value = customAttribute.value[ ca ];
 
-							    customAttribute.array[ offset ]   = value.X;
-							    customAttribute.array[ offset + 1 ] = value.Y;
+                                                    customAttribute.array[ offset ]   = value.X;
+                                                    customAttribute.array[ offset + 1 ] = value.Y;
 
-							    offset += 2;
+                                                    offset += 2;
 
-						    }
+                                                }
 
-					    } else if ( customAttribute.size == 3 ) {
+                                            } else if ( customAttribute.size == 3 ) {
 
-						    if ( customAttribute.type == "c" ) {
+                                                if ( customAttribute.type == "c" ) {
 
-							    for (int ca = 0; ca < cal; ca ++ ) {
+                                                    for (int ca = 0; ca < cal; ca ++ ) {
 
-								    var value = customAttribute.value[ ca ];
+                                                        var value = customAttribute.value[ ca ];
 
-								    customAttribute.array[ offset ]   = value.R;
-								    customAttribute.array[ offset + 1 ] = value.G;
-								    customAttribute.array[ offset + 2 ] = value.B;
+                                                        customAttribute.array[ offset ]   = value.R;
+                                                        customAttribute.array[ offset + 1 ] = value.G;
+                                                        customAttribute.array[ offset + 2 ] = value.B;
 
-								    offset += 3;
+                                                        offset += 3;
 
-							    }
+                                                    }
 
-						    } else {
+                                                } else {
 
-							    for (int ca = 0; ca < cal; ca ++ ) {
+                                                    for (int ca = 0; ca < cal; ca ++ ) {
 
-								    var value = customAttribute.value[ ca ];
+                                                        var value = customAttribute.value[ ca ];
 
-								    customAttribute.array[ offset ]   = value.X;
-								    customAttribute.array[ offset + 1 ] = value.Y;
-								    customAttribute.array[ offset + 2 ] = value.Z;
+                                                        customAttribute.array[ offset ]   = value.X;
+                                                        customAttribute.array[ offset + 1 ] = value.Y;
+                                                        customAttribute.array[ offset + 2 ] = value.Z;
 
-								    offset += 3;
+                                                        offset += 3;
 
-							    }
+                                                    }
 
-						    }
+                                                }
 
-					    } else if ( customAttribute.size == 4 ) {
+                                            } else if ( customAttribute.size == 4 ) {
 
-						    for (int ca = 0; ca < cal; ca ++ ) {
+                                                for (int ca = 0; ca < cal; ca ++ ) {
 
-							    var value = customAttribute.value[ ca ];
+                                                    var value = customAttribute.value[ ca ];
 
-							    customAttribute.array[ offset ]    = value.X;
-							    customAttribute.array[ offset + 1  ] = value.Y;
-							    customAttribute.array[ offset + 2  ] = value.Z;
-							    customAttribute.array[ offset + 3  ] = value.w;
+                                                    customAttribute.array[ offset ]    = value.X;
+                                                    customAttribute.array[ offset + 1  ] = value.Y;
+                                                    customAttribute.array[ offset + 2  ] = value.Z;
+                                                    customAttribute.array[ offset + 3  ] = value.w;
 
-							    offset += 4;
+                                                    offset += 4;
 
-						    }
+                                                }
 
-					    }
+                                            }
 
-                        GL.BindBuffer(BufferTarget.ArrayBuffer, customAttribute.buffer);
-                        GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(customAttribute.array * ????), customAttribute.array, hint);
+                                            GL.BindBuffer(BufferTarget.ArrayBuffer, customAttribute.buffer);
+                                            GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(customAttribute.array * ????), customAttribute.array, hint);
 
-				    }
-                    */
-			    }
+                                        }
+                                        */
+                }
 
-		    }
+            }
 
-	    }
+        }
 
         /// <summary>
         /// 
@@ -6380,9 +6482,9 @@
                     if (geometry.GroupsNeedUpdate)
                     {
                         this.InitMeshBuffers(geometryGroup, object3D);
-                    }                 
+                    }
 
-                    var customAttributesDirty = (material is IAttributes && (null != ((IAttributes)material).Attributes) && AreCustomAttributesDirty( material as IAttributes));
+                    var customAttributesDirty = (material is IAttributes && (null != ((IAttributes)material).Attributes) && AreCustomAttributesDirty(material as IAttributes));
 
                     if (geometry.VerticesNeedUpdate || geometry.MorphTargetsNeedUpdate || geometry.ElementsNeedUpdate
                     || geometry.UvsNeedUpdate || geometry.NormalsNeedUpdate || geometry.ColorsNeedUpdate
@@ -6406,7 +6508,7 @@
             else if (object3D is Line)
             {
                 //var geometry = object3D.Geometry as Geometry;
-                
+
                 material = this.getBufferMaterial(object3D, geometry);
 
                 var customAttributesDirty = (material is IAttributes && (null != ((IAttributes)material).Attributes) && AreCustomAttributesDirty(material as IAttributes));
@@ -6431,7 +6533,7 @@
 
                 var customAttributesDirty = (material is IAttributes && (null != ((IAttributes)material).Attributes) && AreCustomAttributesDirty(material as IAttributes));
 
-                if ( geometry.VerticesNeedUpdate || geometry.ColorsNeedUpdate || pointCloud.sortParticles || customAttributesDirty )
+                if (geometry.VerticesNeedUpdate || geometry.ColorsNeedUpdate || pointCloud.sortParticles || customAttributesDirty)
                 {
                     this.SetParticleBuffers(geometry, BufferUsageHint.DynamicDraw, pointCloud);
                 }
@@ -6449,13 +6551,14 @@
         /// </summary>
         /// <param name="f"></param>
         /// <returns></returns>
-        private int filterFallback (int f )
+        private int filterFallback(int f)
         {
-		    if ( f == Three.NearestFilter || f == Three.NearestMipMapNearestFilter || f == Three.NearestMipMapLinearFilter ) {
+            if (f == Three.NearestFilter || f == Three.NearestMipMapNearestFilter || f == Three.NearestMipMapLinearFilter)
+            {
                 return (int)TextureMinFilter.Nearest;
-		    }
+            }
             return (int)TextureMinFilter.Linear;
-	    }
+        }
 
         // Map three.js constants to WebGL constants
 
@@ -6464,7 +6567,8 @@
         /// </summary>
         /// <param name="p"></param>
         /// <returns></returns>
-	    private int paramThreeToGL (int p ) {
+        private int paramThreeToGL(int p)
+        {
 
             if (p == Three.RepeatWrapping) return (int)TextureWrapMode.Repeat;
             if (p == Three.ClampToEdgeWrapping) return (int)TextureWrapMode.ClampToEdge;
@@ -6504,13 +6608,13 @@
             if (p == Three.ReverseSubtractEquation) return (int)BlendEquationMode.FuncReverseSubtract;
 
             if (p == Three.ZeroFactor) return (int)BlendingFactorSrc.Zero;
-		    if ( p == Three.OneFactor ) return (int)BlendingFactorSrc.One;
-		    if ( p == Three.SrcColorFactor ) return (int)BlendingFactorSrc.SrcColor;
-		    if ( p == Three.OneMinusSrcColorFactor ) return (int)BlendingFactorSrc.OneMinusSrcColor;
-		    if ( p == Three.SrcAlphaFactor ) return (int)BlendingFactorSrc.SrcAlpha;
-		    if ( p == Three.OneMinusSrcAlphaFactor ) return (int)BlendingFactorSrc.OneMinusSrcAlpha;
-		    if ( p == Three.DstAlphaFactor ) return (int)BlendingFactorSrc.DstAlpha;
-		    if ( p == Three.OneMinusDstAlphaFactor ) return (int)BlendingFactorSrc.OneMinusDstAlpha;
+            if (p == Three.OneFactor) return (int)BlendingFactorSrc.One;
+            if (p == Three.SrcColorFactor) return (int)BlendingFactorSrc.SrcColor;
+            if (p == Three.OneMinusSrcColorFactor) return (int)BlendingFactorSrc.OneMinusSrcColor;
+            if (p == Three.SrcAlphaFactor) return (int)BlendingFactorSrc.SrcAlpha;
+            if (p == Three.OneMinusSrcAlphaFactor) return (int)BlendingFactorSrc.OneMinusSrcAlpha;
+            if (p == Three.DstAlphaFactor) return (int)BlendingFactorSrc.DstAlpha;
+            if (p == Three.OneMinusDstAlphaFactor) return (int)BlendingFactorSrc.OneMinusDstAlpha;
 
             if (p == Three.DstColorFactor) return (int)BlendingFactorDest.DstColor;
             if (p == Three.OneMinusDstColorFactor) return (int)BlendingFactorDest.OneMinusDstColor;
@@ -6524,11 +6628,11 @@
                 if (p == Three.RGBA_S3TC_DXT3_Format) return (int)ExtTextureCompressionS3tc.CompressedRgbaS3tcDxt3Ext;
                 if (p == Three.RGBA_S3TC_DXT5_Format) return (int)ExtTextureCompressionS3tc.CompressedRgbaS3tcDxt5Ext;
 
-		    }
+            }
 
-		    return 0;
+            return 0;
 
-	    }
+        }
 
         #endregion
 
