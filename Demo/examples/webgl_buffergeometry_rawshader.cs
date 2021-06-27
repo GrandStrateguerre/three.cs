@@ -1,11 +1,9 @@
 ﻿namespace Demo
 {
+    using Examples;
     using System.Diagnostics;
     using System.Drawing;
     using System.Windows.Forms;
-
-    using Examples;
-
     using ThreeCs;
     using ThreeCs.Cameras;
     using ThreeCs.Core;
@@ -25,47 +23,44 @@
         private Object3D mesh;
 
         private const string FragmentShader = @"
-            #ifdef GL_ES precision mediump float;
-			    precision mediump int;
-            #endif
+            precision mediump float;
+            precision mediump int;
 
-			uniform float time;
+            uniform float time;
 
-			varying vec3 vPosition;
-			varying vec4 vColor;
+            varying vec3 vPosition;
+            varying vec4 vColor;
 
-			void main()	{
+            void main() {
 
-				vec4 color = vec4( vColor );
-				color.r += sin( vPosition.x * 10.0 + time ) * 0.5;
+                vec4 color = vec4( vColor );
+                color.r += sin( vPosition.x * 10.0 + time ) * 0.5;
 
-				gl_FragColor = color;
+                gl_FragColor = color;
 
-			}";
+            }";
 
         private const string VertexShader = @"
-            #ifdef GL_ES 
-                precision mediump float;
-			    precision mediump int;
-            #endif
+            precision mediump float;
+            precision mediump int;
 
-			uniform mat4 modelViewMatrix; // optional
-			uniform mat4 projectionMatrix; // optional
+            uniform mat4 modelViewMatrix; // optional
+            uniform mat4 projectionMatrix; // optional
 
-			attribute vec3 position;
-			attribute vec4 color;
+            attribute vec3 position;
+            attribute vec4 color;
 
-			varying vec3 vPosition;
-			varying vec4 vColor;
+            varying vec3 vPosition;
+            varying vec4 vColor;
 
-			void main()	{
+            void main() {
 
-				vPosition = position;
-				vColor = color;
+                vPosition = position;
+                vColor = color;
 
-				gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+                gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 
-			}";
+            }";
 
         /// <summary>
         /// 
@@ -108,7 +103,7 @@
 
             var material = new RawShaderMaterial()
             {
-                Uniforms = new Uniforms { { "time", new Uniform() { {"type", "f"}, {"value", 1.0f} } } },
+                Uniforms = new Uniforms { { "time", new Uniform() { { "type", "f" }, { "value", 1.0f } } } },
                 VertexShader = VertexShader,
                 FragmentShader = FragmentShader,
                 Side = Three.DoubleSide,

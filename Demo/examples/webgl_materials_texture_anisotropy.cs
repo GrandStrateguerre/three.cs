@@ -1,12 +1,10 @@
 ﻿namespace Demo.examples
 {
+    using Examples;
     using System;
     using System.Diagnostics;
     using System.Drawing;
     using System.Windows.Forms;
-
-    using Examples;
-
     using ThreeCs.Cameras;
     using ThreeCs.Extras;
     using ThreeCs.Extras.Geometries;
@@ -57,14 +55,14 @@
 
             var maxAnisotropy = renderer.MaxAnisotropy;
 
-            var texture1 = ImageUtils.LoadTexture("examples/textures/crate.gif");
+            var texture1 = ImageUtils.LoadTexture("examples/textures/crate.jpg");
             var material1 = new MeshPhongMaterial() { Color = Color.White, Map = texture1 };
 
             texture1.Anisotropy = maxAnisotropy;
             texture1.WrapS = texture1.WrapT = ThreeCs.Three.RepeatWrapping;
             texture1.Repeat = new Vector2(512, 512);
 
-            var texture2 = ImageUtils.LoadTexture("examples/textures/crate.gif");
+            var texture2 = ImageUtils.LoadTexture("examples/textures/crate.jpg");
             var material2 = new MeshPhongMaterial() { Color = Color.White, Map = texture2 };
 
             texture2.Anisotropy = 1;
@@ -87,7 +85,7 @@
             var geometry = new PlaneGeometry(100, 100);
 
             var mesh1 = new Mesh(geometry, material1);
-            mesh1.Rotation.X = (float) -Math.PI / 2;
+            mesh1.Rotation.X = (float)-Math.PI / 2;
             mesh1.Scale = new Vector3(1000, 1000, 1000);
 
             var mesh2 = new Mesh(geometry, material2);
@@ -96,8 +94,8 @@
 
             scene1.Add(mesh1);
             scene2.Add(mesh2);
-    
-			// RENDERER
+
+            // RENDERER
 
             renderer.SetClearColor(scene1.Fog.Color, 1);
             renderer.AutoClear = false;
